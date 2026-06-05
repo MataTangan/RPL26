@@ -17,8 +17,6 @@ Aplikasi marketplace yang memungkinkan pengguna untuk menjual dan membeli produk
 | Frontend   | Next.js (React)               |
 | Backend    | Next.js API Routes            |
 | Database   | PostgreSQL / MySQL            |
-| ORM        | Prisma *(jika digunakan)*     |
-| Styling    | Tailwind CSS *(jika digunakan)* |
 
 ---
 
