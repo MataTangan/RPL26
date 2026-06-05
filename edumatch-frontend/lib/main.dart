@@ -1,32 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
+import 'navigation/siswa_nav.dart';
+import 'navigation/tutor_nav.dart';
+import 'pages/siswa/auth_page.dart';
+import 'pages/tutor/auth_page.dart';
 import 'providers/auth_provider.dart';
-import 'pages/role_selection_page.dart';
-import 'pages/siswa/dashboard_page.dart';
-import 'pages/tutor/dashboard_page.dart';
+import 'theme.dart';
 
-// Legacy imports (kept for named‑route access)
-import 'models/tutor.dart';
-import 'services/api_service.dart';
-import 'widgets/tutor_tile.dart';
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-      ],
-      child: const EduMatchApp(),
-    ),
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// App root
-// ─────────────────────────────────────────────────────────────────────────────
+void main() => runApp(
+      ChangeNotifierProvider(
+        create: (_) => AuthProvider(),
+        child: const EduMatchApp(),
+      ),
+    );
 
 class EduMatchApp extends StatelessWidget {
   const EduMatchApp({super.key});
@@ -36,96 +23,40 @@ class EduMatchApp extends StatelessWidget {
     return MaterialApp(
       title: 'EduMatch',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        textTheme: GoogleFonts.nunitoTextTheme(),
-        colorSchemeSeed: const Color(0xFFF6D365),
-      ),
-      home: const AuthGate(),
-      routes: {
-        '/tutors': (context) => const TutorsPage(),
-      },
+      theme: buildAppTheme(),
+      home: const RoleSelectionScreen(),
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AuthGate — decides what to show based on auth state
+//  Role Selection Screen
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Calls [AuthProvider.checkAuthStatus] once on init, then reactively
-/// switches between the loading screen, role‑selection page, or the
-/// correct dashboard.
-class AuthGate extends StatefulWidget {
-  const AuthGate({super.key});
+class RoleSelectionScreen extends StatefulWidget {
+  const RoleSelectionScreen({super.key});
 
   @override
-  State<AuthGate> createState() => _AuthGateState();
+  State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
 }
 
-class _AuthGateState extends State<AuthGate> {
-  bool _initialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _bootstrap();
-  }
-
-  Future<void> _bootstrap() async {
-    final auth = context.read<AuthProvider>();
-    await auth.checkAuthStatus();
-    if (mounted) setState(() => _initialized = true);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-
-    // ── Still checking SharedPreferences ──────────────────────────────
-    if (!_initialized || auth.isLoading) {
-      return const _JoyfulLoadingScreen();
-    }
-
-    // ── Authenticated → route to the right dashboard ─────────────────
-    if (auth.isLoggedIn) {
-      if (auth.role == 'tutor') {
-        return const TutorDashboardPage();
-      }
-      return const SiswaDashboardPage();
-    }
-
-    // ── Not authenticated → role selection ────────────────────────────
-    return const RoleSelectionPage();
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Joyful Loading Screen
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _JoyfulLoadingScreen extends StatefulWidget {
-  const _JoyfulLoadingScreen();
-
-  @override
-  State<_JoyfulLoadingScreen> createState() => _JoyfulLoadingScreenState();
-}
-
-class _JoyfulLoadingScreenState extends State<_JoyfulLoadingScreen>
+class _RoleSelectionScreenState extends State<RoleSelectionScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
-  late Animation<double> _bounce;
+  late Animation<double> _fade;
+  late Animation<Offset> _slide;
 
   @override
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _bounce = Tween<double>(begin: 0.0, end: -18.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
+        vsync: this, duration: const Duration(milliseconds: 600));
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.12),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _ctrl.forward();
   }
 
   @override
@@ -134,78 +65,117 @@ class _JoyfulLoadingScreenState extends State<_JoyfulLoadingScreen>
     super.dispose();
   }
 
+  void _goSiswa(BuildContext context) {
+    // Show auth first, then navigate to SiswaNav on pop
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const _SiswaEntryFlow()),
+    );
+  }
+
+  void _goTutor(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const _TutorEntryFlow()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFF6D365), // mustard
-              Color(0xFF96E6A1), // mint
-              Color(0xFFA29BFE), // pastel purple
-            ],
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Bouncing emoji logo
-              AnimatedBuilder(
-                animation: _bounce,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, _bounce.value),
-                    child: child,
-                  );
-                },
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
-                    borderRadius: BorderRadius.circular(32),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fade,
+          child: SlideTransition(
+            position: _slide,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  const Spacer(flex: 2),
+
+                  // ── Logo ─────────────────────────────────────────
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.mustardYellow,
+                          AppColors.brightOrange
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(32),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.mustardYellow.withOpacity(0.5),
+                          blurRadius: 30,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Text('🎓', style: TextStyle(fontSize: 48)),
+                    ),
                   ),
-                  child: const Center(
-                    child: Text('✨', style: TextStyle(fontSize: 48)),
+                  const SizedBox(height: 22),
+                  Text('EduMatch', style: AppTextStyles.displayBold.copyWith(fontSize: 32)),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Connect. Learn. Grow. ✨',
+                    style: AppTextStyles.appBarSub.copyWith(fontSize: 15),
+                    textAlign: TextAlign.center,
                   ),
-                ),
+                  const Spacer(flex: 2),
+
+                  // ── Role prompt ───────────────────────────────────
+                  Text(
+                    'I am a…',
+                    style: AppTextStyles.cardTitle.copyWith(fontSize: 17),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ── Siswa card ────────────────────────────────────
+                  _RoleCard(
+                    emoji: '👨‍🎓',
+                    title: 'Siswa',
+                    subtitle: 'Find & book the perfect tutor for me',
+                    gradient: const [
+                      AppColors.mustardYellow,
+                      AppColors.brightOrange
+                    ],
+                    shadow: AppColors.mustardYellow,
+                    onTap: () => _goSiswa(context),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ── Tutor card ────────────────────────────────────
+                  _RoleCard(
+                    emoji: '👩‍🏫',
+                    title: 'Tutor',
+                    subtitle: 'Teach students & manage my sessions',
+                    gradient: const [
+                      AppColors.mintGreen,
+                      AppColors.skyBlue
+                    ],
+                    shadow: AppColors.mintGreen,
+                    onTap: () => _goTutor(context),
+                  ),
+                  const Spacer(flex: 2),
+
+                  // ── Footer ────────────────────────────────────────
+                  Text(
+                    'EduMatch v1.0  ·  All rights reserved 2026',
+                    style: AppTextStyles.bodyMuted.copyWith(fontSize: 11),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
-              const SizedBox(height: 28),
-              Text(
-                'EduMatch',
-                style: GoogleFonts.nunito(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Memuat kebahagiaan…',
-                style: GoogleFonts.nunito(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white.withOpacity(0.85),
-                ),
-              ),
-              const SizedBox(height: 32),
-              // Rounded loading indicator
-              SizedBox(
-                width: 36,
-                height: 36,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3.5,
-                  color: Colors.white,
-                  backgroundColor: Colors.white.withOpacity(0.2),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -213,47 +183,214 @@ class _JoyfulLoadingScreenState extends State<_JoyfulLoadingScreen>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Legacy TutorsPage (kept as named route '/tutors')
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Role card ────────────────────────────────────────────────────────────────
 
-class TutorsPage extends StatefulWidget {
-  const TutorsPage({super.key});
+class _RoleCard extends StatefulWidget {
+  final String emoji, title, subtitle;
+  final List<Color> gradient;
+  final Color shadow;
+  final VoidCallback onTap;
+  const _RoleCard({
+    required this.emoji,
+    required this.title,
+    required this.subtitle,
+    required this.gradient,
+    required this.shadow,
+    required this.onTap,
+  });
 
   @override
-  State<TutorsPage> createState() => _TutorsPageState();
+  State<_RoleCard> createState() => _RoleCardState();
 }
 
-class _TutorsPageState extends State<TutorsPage> {
-  late Future<List<Tutor>> _future;
+class _RoleCardState extends State<_RoleCard> {
+  bool _pressed = false;
 
   @override
-  void initState() {
-    super.initState();
-    _future = ApiService.fetchTutors();
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 22),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                widget.gradient[0].withOpacity(0.15),
+                widget.gradient[1].withOpacity(0.08),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+                color: widget.gradient[0].withOpacity(0.35), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: widget.shadow.withOpacity(0.18),
+                blurRadius: 22,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: widget.gradient,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.shadow.withOpacity(0.4),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(widget.emoji, style: const TextStyle(fontSize: 32)),
+              ),
+            ),
+            const SizedBox(width: 18),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.title,
+                      style: AppTextStyles.cardTitle.copyWith(fontSize: 19)),
+                  const SizedBox(height: 4),
+                  Text(widget.subtitle, style: AppTextStyles.bodyMuted),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded,
+                size: 16, color: widget.gradient[0]),
+          ]),
+        ),
+      ),
+    );
   }
+}
+
+// ─── Siswa entry flow ─────────────────────────────────────────────────────────
+// Shows auth page, then replaces stack with SiswaNav on back/success.
+
+class _SiswaEntryFlow extends StatelessWidget {
+  const _SiswaEntryFlow();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tutors')),
-      body: FutureBuilder<List<Tutor>>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          final tutors = snapshot.data ?? [];
-          if (tutors.isEmpty) return const Center(child: Text('No tutors found'));
-          return ListView.builder(
-            itemCount: tutors.length,
-            itemBuilder: (context, i) => TutorTile(tutor: tutors[i]),
-          );
-        },
-      ),
+      backgroundColor: AppColors.background,
+      body: Stack(children: [
+        const SiswaAuthPage(),
+        // Floating "Skip / Continue as Guest" bar at the bottom
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            color: AppColors.background,
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            child: GestureDetector(
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const SiswaNav()),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 12),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    'Skip → Enter as Guest',
+                    style: GoogleFonts.nunito(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: const Color(0xFF888899),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+// ─── Tutor entry flow ─────────────────────────────────────────────────────────
+// Shows tutor auth page, then routes to TutorNav.
+
+class _TutorEntryFlow extends StatelessWidget {
+  const _TutorEntryFlow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Stack(children: [
+        const TutorAuthPage(),
+        // Floating skip bar
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            color: AppColors.background,
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            child: GestureDetector(
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const TutorNav()),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 12),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    'Skip → Enter as Tutor Guest',
+                    style: GoogleFonts.nunito(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: const Color(0xFF888899),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 }

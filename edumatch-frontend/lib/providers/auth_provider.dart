@@ -1,104 +1,145 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config/env.dart';
 
-/// Manages authentication state for EduMatch.
-///
-/// Persists JWT token and user role ("siswa" | "tutor") in SharedPreferences.
-/// Notifies listeners on every state change so the UI can react accordingly.
+// ─────────────────────────────────────────────────────────────────────────────
+//  AuthProvider
+//  Handles login / register for both Siswa and Tutor roles.
+//  Persists the JWT token using SharedPreferences.
+// ─────────────────────────────────────────────────────────────────────────────
+
 class AuthProvider with ChangeNotifier {
-  // ── Private state ──────────────────────────────────────────────────────
-  bool _isLoggedIn = false;
+  // ── State ──────────────────────────────────────────────────────────────────
   String? _token;
-  String? _role; // "siswa" | "tutor"
-  bool _isLoading = true; // true while checking auth on startup
+  Map<String, dynamic>? _user;
 
-  // ── Public getters ─────────────────────────────────────────────────────
-  bool get isLoggedIn => _isLoggedIn;
   String? get token => _token;
-  String? get role => _role;
-  bool get isLoading => _isLoading;
+  Map<String, dynamic>? get user => _user;
+  bool get isAuthenticated => _token != null;
+  String get userName => _user?['name'] ?? '';
+  String get userEmail => _user?['email'] ?? '';
+  String get userRole => _user?['role'] ?? '';
 
-  // ── SharedPreferences keys ─────────────────────────────────────────────
-  static const _keyToken = 'auth_token';
-  static const _keyRole = 'auth_role';
+  // ── SharedPreferences keys ─────────────────────────────────────────────────
+  static const _keyToken = 'edumatch_token';
+  static const _keyUser  = 'edumatch_user';
 
-  // ── Check persisted auth on startup ────────────────────────────────────
-  /// Call this once from the AuthGate widget in main.dart.
-  /// Reads token & role from SharedPreferences and updates state.
-  Future<void> checkAuthStatus() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      _token = prefs.getString(_keyToken);
-      _role = prefs.getString(_keyRole);
-      _isLoggedIn = _token != null && _token!.isNotEmpty;
-    } catch (e) {
-      debugPrint('AuthProvider.checkAuthStatus error: $e');
-      _isLoggedIn = false;
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  // ── Dummy login (simulates network call) ───────────────────────────────
-  /// Simulates a 1.5‑second network delay, then saves a mock JWT token and
-  /// the chosen [role] to SharedPreferences.
-  ///
-  /// Returns `true` on success, `false` on failure.
-  Future<bool> login(String email, String password, String role) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // Simulate network latency
-      await Future.delayed(const Duration(milliseconds: 1500));
-
-      // --- Mock validation (replace with real API call later) ---
-      if (email.isEmpty || password.isEmpty) {
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-
-      // Generate a mock JWT token
-      const mockToken =
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
-          '.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkVkdU1hdGNoIFVzZXIiLCJpYXQiOjE3MTcwMDAwMDB9'
-          '.mock_signature_edumatch';
-
-      // Persist to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_keyToken, mockToken);
-      await prefs.setString(_keyRole, role);
-
-      // Update in‑memory state
-      _token = mockToken;
-      _role = role;
-      _isLoggedIn = true;
-      _isLoading = false;
+  // ── Initialise from persisted storage ─────────────────────────────────────
+  Future<void> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedToken = prefs.getString(_keyToken);
+    final savedUser  = prefs.getString(_keyUser);
+    if (savedToken != null && savedUser != null) {
+      _token = savedToken;
+      _user  = json.decode(savedUser) as Map<String, dynamic>;
       notifyListeners();
-      return true;
-    } catch (e) {
-      debugPrint('AuthProvider.login error: $e');
-      _isLoading = false;
-      notifyListeners();
-      return false;
     }
   }
 
-  // ── Logout ─────────────────────────────────────────────────────────────
-  /// Clears persisted auth data and resets in‑memory state.
+  // ── Persist helpers ────────────────────────────────────────────────────────
+  Future<void> _saveSession(String token, Map<String, dynamic> user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyToken, token);
+    await prefs.setString(_keyUser, json.encode(user));
+    _token = token;
+    _user  = user;
+    notifyListeners();
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyToken);
-    await prefs.remove(_keyRole);
-
+    await prefs.remove(_keyUser);
     _token = null;
-    _role = null;
-    _isLoggedIn = false;
+    _user  = null;
     notifyListeners();
   }
+
+  // ── Internal POST helper ───────────────────────────────────────────────────
+  Future<Map<String, dynamic>> _post(String path, Map<String, dynamic> body) async {
+    final uri = Uri.parse('$apiBase$path');
+    final res = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    ).timeout(const Duration(seconds: 15));
+
+    final decoded = json.decode(res.body) as Map<String, dynamic>;
+
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return decoded;
+    }
+
+    // Extract the human-readable message sent by the backend
+    final message = decoded['message'] ?? 'Terjadi kesalahan. Coba lagi.';
+    throw AuthException(message);
+  }
+
+  // ── Siswa login ────────────────────────────────────────────────────────────
+  Future<void> loginSiswa({
+    required String email,
+    required String password,
+  }) async {
+    final data = await _post('/siswa/auth/login', {
+      'email': email,
+      'password': password,
+    });
+    await _saveSession(data['token'] as String, data['user'] as Map<String, dynamic>);
+  }
+
+  // ── Siswa register ─────────────────────────────────────────────────────────
+  Future<void> registerSiswa({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final data = await _post('/siswa/auth/register', {
+      'name': name,
+      'email': email,
+      'password': password,
+    });
+    await _saveSession(data['token'] as String, data['user'] as Map<String, dynamic>);
+  }
+
+  // ── Tutor login ────────────────────────────────────────────────────────────
+  Future<void> loginTutor({
+    required String email,
+    required String password,
+  }) async {
+    final data = await _post('/tutor/auth/login', {
+      'email': email,
+      'password': password,
+    });
+    await _saveSession(data['token'] as String, data['user'] as Map<String, dynamic>);
+  }
+
+  // ── Tutor register ─────────────────────────────────────────────────────────
+  Future<void> registerTutor({
+    required String name,
+    required String email,
+    required String password,
+    String phone = '',
+  }) async {
+    final data = await _post('/tutor/auth/register', {
+      'name': name,
+      'email': email,
+      'password': password,
+      'phone': phone,
+    });
+    await _saveSession(data['token'] as String, data['user'] as Map<String, dynamic>);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  AuthException — carries the backend's human-readable error message
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AuthException implements Exception {
+  final String message;
+  const AuthException(this.message);
+
+  @override
+  String toString() => message;
 }
