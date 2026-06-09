@@ -4,8 +4,15 @@ import '../../models/booking_session.dart';
 import '../../services/mock_data.dart';
 import '../../theme.dart';
 
-class TutorIncomePage extends StatelessWidget {
+class TutorIncomePage extends StatefulWidget {
   const TutorIncomePage({super.key});
+
+  @override
+  State<TutorIncomePage> createState() => _TutorIncomePageState();
+}
+
+class _TutorIncomePageState extends State<TutorIncomePage> {
+  bool _hasRequestedPayout = false;
 
   static const _monthlyData = [
     _MonthIncome(month: 'Jan', amount: 7800),
@@ -19,8 +26,60 @@ class TutorIncomePage extends StatelessWidget {
   double get _maxAmount =>
       _monthlyData.fold(0, (m, e) => e.amount > m ? e.amount : m);
 
-  double get _totalThisYear =>
-      _monthlyData.fold(0, (s, e) => s + e.amount);
+  double get _totalThisYear => _hasRequestedPayout
+      ? 0.0
+      : _monthlyData.fold(0, (s, e) => s + e.amount);
+
+  void _requestPayout() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        title: const Center(child: Text('💸', style: TextStyle(fontSize: 48))),
+        content: Text(
+          'Permintaan Payout Sedang Diproses!',
+          textAlign: TextAlign.center,
+          style: AppTextStyles.cardTitle.copyWith(fontSize: 18),
+        ),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              setState(() => _hasRequestedPayout = true);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Payout requested successfully! 🏦',
+                      style: GoogleFonts.nunito(
+                          fontWeight: FontWeight.w700, color: Colors.white)),
+                  backgroundColor: AppColors.mintGreen,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                ),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: AppColors.mintGreen,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Center(
+                child: Text(
+                  'OK',
+                  style: GoogleFonts.nunito(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +150,7 @@ class TutorIncomePage extends StatelessWidget {
                 Row(children: [
                   _HeroStat(
                       label: 'This Month',
-                      value: 'Rp 12,350',
+                      value: _hasRequestedPayout ? 'Rp 0' : 'Rp 12,350,000',
                       icon: '📅'),
                   const SizedBox(width: 20),
                   _HeroStat(
@@ -99,7 +158,7 @@ class TutorIncomePage extends StatelessWidget {
                       value: '${past.length + active.length}',
                       icon: '📚'),
                   const SizedBox(width: 20),
-                  _HeroStat(label: 'Avg/Session', value: 'Rp 85', icon: '⭐'),
+                  _HeroStat(label: 'Avg/Session', value: 'Rp 85,000', icon: '⭐'),
                 ]),
               ]),
             ),
@@ -140,23 +199,23 @@ class TutorIncomePage extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              // Value label (only last bar)
-                              if (isLast)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Text(
-                                    '${(d.amount / 1000).toStringAsFixed(1)}K',
-                                    style: GoogleFonts.nunito(
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 9,
-                                      color: accent,
+                                // Value label (only last bar)
+                                if (isLast)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
+                                    child: Text(
+                                      _hasRequestedPayout ? '0K' : '${(d.amount / 1000).toStringAsFixed(1)}K',
+                                      style: GoogleFonts.nunito(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 9,
+                                        color: accent,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 600),
-                                curve: Curves.easeOut,
-                                height: 120 * ratio,
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 600),
+                                  curve: Curves.easeOut,
+                                  height: _hasRequestedPayout ? 0 : (120 * ratio),
                                 decoration: BoxDecoration(
                                   color: isLast ? accent : accent.withOpacity(0.35),
                                   borderRadius: const BorderRadius.vertical(
@@ -315,28 +374,33 @@ class TutorIncomePage extends StatelessWidget {
 
             // ── Payout button ─────────────────────────────────────
             GestureDetector(
-              onTap: () {},
-              child: Container(
+              onTap: _hasRequestedPayout ? null : _requestPayout,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 17),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.mustardYellow, AppColors.brightOrange],
+                  gradient: LinearGradient(
+                    colors: _hasRequestedPayout
+                        ? [Colors.grey.shade400, Colors.grey.shade500]
+                        : [AppColors.mustardYellow, AppColors.brightOrange],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(50),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.mustardYellow.withOpacity(0.45),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+                  boxShadow: _hasRequestedPayout
+                      ? []
+                      : [
+                          BoxShadow(
+                            color: AppColors.mustardYellow.withOpacity(0.45),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                 ),
                 child: Center(
                   child: Text(
-                    '🏦  Request Payout',
+                    _hasRequestedPayout ? 'Payout Processing ⏳' : '🏦  Request Payout',
                     style: GoogleFonts.nunito(
                         fontWeight: FontWeight.w900,
                         fontSize: 16,

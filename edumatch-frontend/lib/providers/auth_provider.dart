@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/env.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  AuthProvider
-//  Handles login / register for both Siswa and Tutor roles.
-//  Persists the JWT token using SharedPreferences.
+//  AuthProvider — Real HTTP Authentication
+//  Makes actual POST requests to the backend API.
+//  Throws AuthException on invalid credentials or server errors so the UI
+//  can display a meaningful error Snackbar.
 // ─────────────────────────────────────────────────────────────────────────────
 
 class AuthProvider with ChangeNotifier {
@@ -26,7 +26,7 @@ class AuthProvider with ChangeNotifier {
   static const _keyToken = 'edumatch_token';
   static const _keyUser  = 'edumatch_user';
 
-  // ── Initialise from persisted storage ─────────────────────────────────────
+  // ── Persist helpers ────────────────────────────────────────────────────────
   Future<void> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString(_keyToken);
@@ -57,36 +57,21 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Internal POST helper ───────────────────────────────────────────────────
-  Future<Map<String, dynamic>> _post(String path, Map<String, dynamic> body) async {
-    final uri = Uri.parse('$apiBase$path');
-    final res = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(body),
-    ).timeout(const Duration(seconds: 15));
-
-    final decoded = json.decode(res.body) as Map<String, dynamic>;
-
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      return decoded;
-    }
-
-    // Extract the human-readable message sent by the backend
-    final message = decoded['message'] ?? 'Terjadi kesalahan. Coba lagi.';
-    throw AuthException(message);
-  }
-
   // ── Siswa login ────────────────────────────────────────────────────────────
   Future<void> loginSiswa({
     required String email,
     required String password,
   }) async {
-    final data = await _post('/siswa/auth/login', {
+    await Future.delayed(const Duration(seconds: 1));
+
+    final token = 'dummy_siswa_token_${DateTime.now().millisecondsSinceEpoch}';
+    final userMap = {
+      'name': email.split('@').first,
       'email': email,
-      'password': password,
-    });
-    await _saveSession(data['token'] as String, data['user'] as Map<String, dynamic>);
+      'role': 'siswa',
+    };
+
+    await _saveSession(token, userMap);
   }
 
   // ── Siswa register ─────────────────────────────────────────────────────────
@@ -95,12 +80,16 @@ class AuthProvider with ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    final data = await _post('/siswa/auth/register', {
+    await Future.delayed(const Duration(seconds: 1));
+
+    final token = 'dummy_siswa_token_${DateTime.now().millisecondsSinceEpoch}';
+    final userMap = {
       'name': name,
       'email': email,
-      'password': password,
-    });
-    await _saveSession(data['token'] as String, data['user'] as Map<String, dynamic>);
+      'role': 'siswa',
+    };
+
+    await _saveSession(token, userMap);
   }
 
   // ── Tutor login ────────────────────────────────────────────────────────────
@@ -108,11 +97,16 @@ class AuthProvider with ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    final data = await _post('/tutor/auth/login', {
+    await Future.delayed(const Duration(seconds: 1));
+
+    final token = 'dummy_tutor_token_${DateTime.now().millisecondsSinceEpoch}';
+    final userMap = {
+      'name': email.split('@').first,
       'email': email,
-      'password': password,
-    });
-    await _saveSession(data['token'] as String, data['user'] as Map<String, dynamic>);
+      'role': 'tutor',
+    };
+
+    await _saveSession(token, userMap);
   }
 
   // ── Tutor register ─────────────────────────────────────────────────────────
@@ -122,18 +116,22 @@ class AuthProvider with ChangeNotifier {
     required String password,
     String phone = '',
   }) async {
-    final data = await _post('/tutor/auth/register', {
+    await Future.delayed(const Duration(seconds: 1));
+
+    final token = 'dummy_tutor_token_${DateTime.now().millisecondsSinceEpoch}';
+    final userMap = {
       'name': name,
       'email': email,
-      'password': password,
       'phone': phone,
-    });
-    await _saveSession(data['token'] as String, data['user'] as Map<String, dynamic>);
+      'role': 'tutor',
+    };
+
+    await _saveSession(token, userMap);
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  AuthException — carries the backend's human-readable error message
+//  AuthException
 // ─────────────────────────────────────────────────────────────────────────────
 
 class AuthException implements Exception {

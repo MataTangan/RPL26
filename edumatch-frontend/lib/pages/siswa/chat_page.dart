@@ -14,11 +14,13 @@ class _ChatMessage {
 // ─── Mock conversation ────────────────────────────────────────────────────────
 final _mockMessages = [
   const _ChatMessage(
-      text: 'Halo! Saya tertarik untuk belajar Matematika. Apakah masih ada slot kosong?',
+      text:
+          'Halo! Saya tertarik untuk belajar Matematika. Apakah masih ada slot kosong?',
       isMe: true,
       time: '09:12'),
   const _ChatMessage(
-      text: 'Halo Rizky! Tentu, masih ada. Senin pagi jam 09:00–10:00 tersedia. 😊',
+      text:
+          'Halo Rizky! Tentu, masih ada. Senin pagi jam 09:00–10:00 tersedia. 😊',
       isMe: false,
       time: '09:14'),
   const _ChatMessage(
@@ -26,7 +28,8 @@ final _mockMessages = [
       isMe: true,
       time: '09:15'),
   const _ChatMessage(
-      text: 'Bisa banget! Kalkulus adalah salah satu keahlian utama saya. Kita mulai dari dasar ya.',
+      text:
+          'Bisa banget! Kalkulus adalah salah satu keahlian utama saya. Kita mulai dari dasar ya.',
       isMe: false,
       time: '09:16'),
   const _ChatMessage(
@@ -127,7 +130,7 @@ class _SiswaChatPageState extends State<SiswaChatPage> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -156,7 +159,7 @@ class _SiswaChatPageState extends State<SiswaChatPage> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: widget.accent.withOpacity(0.35),
+                      color: widget.accent.withValues(alpha: 0.35),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -173,8 +176,8 @@ class _SiswaChatPageState extends State<SiswaChatPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(widget.tutorName,
-                          style: AppTextStyles.cardTitle
-                              .copyWith(fontSize: 15)),
+                          style:
+                              AppTextStyles.cardTitle.copyWith(fontSize: 15)),
                       Row(children: [
                         Container(
                           width: 8,
@@ -195,7 +198,7 @@ class _SiswaChatPageState extends State<SiswaChatPage> {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: widget.accent.withOpacity(0.15),
+                  color: widget.accent.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(Icons.videocam_outlined,
@@ -229,7 +232,7 @@ class _SiswaChatPageState extends State<SiswaChatPage> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 14,
                   offset: const Offset(0, -4),
                 ),
@@ -241,8 +244,7 @@ class _SiswaChatPageState extends State<SiswaChatPage> {
                   decoration: BoxDecoration(
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                        color: Colors.grey.shade200, width: 1.5),
+                    border: Border.all(color: Colors.grey.shade200, width: 1.5),
                   ),
                   child: TextField(
                     controller: _msgCtrl,
@@ -279,7 +281,7 @@ class _SiswaChatPageState extends State<SiswaChatPage> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: widget.accent.withOpacity(0.4),
+                        color: widget.accent.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -319,7 +321,7 @@ class _Bubble extends StatelessWidget {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.25),
+                color: accent.withValues(alpha: 0.25),
                 shape: BoxShape.circle,
               ),
               child: const Center(
@@ -333,8 +335,8 @@ class _Bubble extends StatelessWidget {
                   isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 11),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 0.68,
                   ),
@@ -349,8 +351,8 @@ class _Bubble extends StatelessWidget {
                     boxShadow: [
                       BoxShadow(
                         color: isMe
-                            ? accent.withOpacity(0.25)
-                            : Colors.black.withOpacity(0.06),
+                            ? accent.withValues(alpha: 0.25)
+                            : Colors.black.withValues(alpha: 0.06),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
@@ -419,11 +421,11 @@ class _TypingBubbleState extends State<_TypingBubble>
           width: 30,
           height: 30,
           decoration: BoxDecoration(
-            color: widget.accent.withOpacity(0.25),
+            color: widget.accent.withValues(alpha: 0.25),
             shape: BoxShape.circle,
           ),
-          child: const Center(
-              child: Text('🌟', style: TextStyle(fontSize: 14))),
+          child:
+              const Center(child: Text('🌟', style: TextStyle(fontSize: 14))),
         ),
         const SizedBox(width: 8),
         Container(
@@ -438,7 +440,7 @@ class _TypingBubbleState extends State<_TypingBubble>
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),

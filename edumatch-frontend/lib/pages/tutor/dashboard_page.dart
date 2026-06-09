@@ -22,17 +22,16 @@ class TutorDashboardPage extends StatelessWidget {
     final pending = MockData.sessions
         .where((s) => s.status == SessionStatus.pending)
         .toList();
-    final completed = MockData.sessions
-        .where((s) => s.status == SessionStatus.past)
-        .toList();
+    final completed =
+        MockData.sessions.where((s) => s.status == SessionStatus.past).toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 18, 16, 24),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             // ── Greeting row ──────────────────────────────────────
             Row(children: [
               Container(
@@ -43,24 +42,28 @@ class TutorDashboardPage extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.mustardYellow.withOpacity(0.4),
+                      color: AppColors.mustardYellow.withValues(alpha: 0.4),
                       blurRadius: 14,
                       offset: const Offset(0, 6),
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Text(_tutorEmoji, style: const TextStyle(fontSize: 24)),
+                child: const Center(
+                  child: Text(_tutorEmoji, style: TextStyle(fontSize: 24)),
                 ),
               ),
               const SizedBox(width: 14),
               Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Good morning! 👋',
-                      style: AppTextStyles.bodyMuted.copyWith(fontSize: 13)),
-                  Text(_tutorName,
-                      style: AppTextStyles.cardTitle.copyWith(fontSize: 18)),
-                ]),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Good morning! 👋',
+                          style:
+                              AppTextStyles.bodyMuted.copyWith(fontSize: 13)),
+                      Text(_tutorName,
+                          style:
+                              AppTextStyles.cardTitle.copyWith(fontSize: 18)),
+                    ]),
               ),
               Container(
                 width: 42,
@@ -70,7 +73,7 @@ class TutorDashboardPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.07),
+                      color: Colors.black.withValues(alpha: 0.07),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -95,61 +98,65 @@ class TutorDashboardPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.deepBlue.withOpacity(0.35),
+                    color: AppColors.deepBlue.withValues(alpha: 0.35),
                     blurRadius: 24,
                     offset: const Offset(0, 10),
                   ),
                 ],
               ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Text('💰  Total Earnings',
-                        style: GoogleFonts.nunito(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                            color: Colors.white.withOpacity(0.85))),
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppColors.mintGreen.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Text('This Month',
-                        style: GoogleFonts.nunito(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11,
-                            color: Colors.white.withOpacity(0.8))),
-                  ),
-                ]),
-                const SizedBox(height: 14),
-                Text(
-                  'Rp ${_totalEarnings.toStringAsFixed(0)}',
-                  style: GoogleFonts.nunito(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 34,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(children: [
-                  const Text('📈', style: TextStyle(fontSize: 14)),
-                  const SizedBox(width: 6),
-                  Text('+12.4% from last month',
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Text('💰  Total Earnings',
+                            style: GoogleFonts.nunito(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                                color: Colors.white.withValues(alpha: 0.85))),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppColors.mintGreen.withValues(alpha: 0.25),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Text('This Month',
+                            style: GoogleFonts.nunito(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 11,
+                                color: Colors.white.withValues(alpha: 0.8))),
+                      ),
+                    ]),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Rp ${_totalEarnings.toStringAsFixed(0)}',
                       style: GoogleFonts.nunito(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          color: Colors.white.withOpacity(0.75))),
-                ]),
-              ]),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 34,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      const Text('📈', style: TextStyle(fontSize: 14)),
+                      const SizedBox(width: 6),
+                      Text('+12.4% from last month',
+                          style: GoogleFonts.nunito(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.75))),
+                    ]),
+                  ]),
             ),
             const SizedBox(height: 18),
 
@@ -170,14 +177,14 @@ class TutorDashboardPage extends StatelessWidget {
               ),
             ]),
             const SizedBox(height: 12),
-            Row(children: [
+            const Row(children: [
               _QuickStat(
                 emoji: '👩‍🎓',
                 value: '$_totalStudents',
                 label: 'Students',
                 accent: AppColors.pastelPurple,
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               _QuickStat(
                 emoji: '⭐',
                 value: '$_rating',
@@ -198,7 +205,7 @@ class TutorDashboardPage extends StatelessWidget {
             const SizedBox(height: 12),
 
             if (upcoming.isEmpty)
-              _EmptyCard(
+              const _EmptyCard(
                 emoji: '🎉',
                 msg: 'No sessions today!',
                 sub: 'Check back tomorrow.',
@@ -233,10 +240,10 @@ class TutorDashboardPage extends StatelessWidget {
             const SizedBox(height: 12),
 
             if (pending.isEmpty)
-              _EmptyCard(emoji: '📭', msg: 'No pending requests', sub: '')
+              const _EmptyCard(emoji: '📭', msg: 'No pending requests', sub: '')
             else
-              ...pending.take(2).toList().asMap().entries.map((e) =>
-                  _RequestPreviewCard(session: e.value, index: e.key)),
+              ...pending.take(2).toList().asMap().entries.map(
+                  (e) => _RequestPreviewCard(session: e.value, index: e.key)),
 
             const SizedBox(height: 24),
 
@@ -246,7 +253,8 @@ class TutorDashboardPage extends StatelessWidget {
             const SizedBox(height: 12),
 
             if (completed.isEmpty)
-              _EmptyCard(emoji: '📚', msg: 'No past sessions yet', sub: '')
+              const _EmptyCard(
+                  emoji: '📚', msg: 'No past sessions yet', sub: '')
             else
               Container(
                 padding: const EdgeInsets.all(16),
@@ -255,7 +263,7 @@ class TutorDashboardPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -264,8 +272,8 @@ class TutorDashboardPage extends StatelessWidget {
                 child: Column(
                   children: completed.take(3).toList().asMap().entries.map((e) {
                     final s = e.value;
-                    final accent = AppColors.cardAccents[
-                        e.key % AppColors.cardAccents.length];
+                    final accent = AppColors
+                        .cardAccents[e.key % AppColors.cardAccents.length];
                     return Padding(
                       padding: EdgeInsets.only(
                           bottom: e.key < completed.length - 1 ? 12 : 0),
@@ -273,8 +281,8 @@ class TutorDashboardPage extends StatelessWidget {
                         Container(
                           width: 36,
                           height: 36,
-                          decoration:
-                              BoxDecoration(color: accent, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                              color: accent, shape: BoxShape.circle),
                           child: Center(
                             child: Text(s.tutorAvatarEmoji,
                                 style: const TextStyle(fontSize: 16)),
@@ -282,16 +290,21 @@ class TutorDashboardPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text(s.studentName,
-                                style:
-                                    AppTextStyles.chip.copyWith(color: AppColors.deepBlue, fontSize: 13)),
-                            Text(s.subject, style: AppTextStyles.bodyMuted.copyWith(fontSize: 11)),
-                          ]),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(s.studentName,
+                                    style: AppTextStyles.chip.copyWith(
+                                        color: AppColors.deepBlue,
+                                        fontSize: 13)),
+                                Text(s.subject,
+                                    style: AppTextStyles.bodyMuted
+                                        .copyWith(fontSize: 11)),
+                              ]),
                         ),
                         Text('Rp ${s.ratePerHour.toStringAsFixed(0)}',
-                            style:
-                                AppTextStyles.priceBadge.copyWith(fontSize: 14)),
+                            style: AppTextStyles.priceBadge
+                                .copyWith(fontSize: 14)),
                       ]),
                     );
                   }).toList(),
@@ -324,7 +337,7 @@ class _QuickStat extends StatelessWidget {
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: accent.withOpacity(0.2),
+                color: accent.withValues(alpha: 0.2),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -335,15 +348,18 @@ class _QuickStat extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.15),
+                color: accent.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Center(child: Text(emoji, style: const TextStyle(fontSize: 22))),
+              child: Center(
+                  child: Text(emoji, style: const TextStyle(fontSize: 22))),
             ),
             const SizedBox(width: 12),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(value, style: AppTextStyles.cardTitle.copyWith(fontSize: 22)),
-              Text(label, style: AppTextStyles.bodyMuted.copyWith(fontSize: 11)),
+              Text(value,
+                  style: AppTextStyles.cardTitle.copyWith(fontSize: 22)),
+              Text(label,
+                  style: AppTextStyles.bodyMuted.copyWith(fontSize: 11)),
             ]),
           ]),
         ),
@@ -368,7 +384,7 @@ class _UpcomingCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: accent.withOpacity(0.2),
+              color: accent.withValues(alpha: 0.2),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -380,12 +396,14 @@ class _UpcomingCard extends StatelessWidget {
             height: 50,
             decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
             child: Center(
-              child: Text(s.tutorAvatarEmoji, style: const TextStyle(fontSize: 22)),
+              child: Text(s.tutorAvatarEmoji,
+                  style: const TextStyle(fontSize: 22)),
             ),
           ),
           const SizedBox(width: 14),
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.studentName,
                   style: AppTextStyles.cardTitle.copyWith(fontSize: 14)),
               Text(s.subject, style: AppTextStyles.bodyMuted),
@@ -401,7 +419,7 @@ class _UpcomingCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.mintGreen.withOpacity(0.15),
+              color: AppColors.mintGreen.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(50),
             ),
             child: Text('🟢 Live',
@@ -421,8 +439,8 @@ class _RequestPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = AppColors.cardAccents[
-        (index + 2) % AppColors.cardAccents.length];
+    final accent =
+        AppColors.cardAccents[(index + 2) % AppColors.cardAccents.length];
     final s = session;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -431,10 +449,10 @@ class _RequestPreviewCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: accent.withOpacity(0.3), width: 1.5),
+          border: Border.all(color: accent.withValues(alpha: 0.3), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
             ),
           ],
@@ -443,25 +461,31 @@ class _RequestPreviewCard extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(color: accent.withOpacity(0.2), shape: BoxShape.circle),
-            child: Center(child: Text('👤', style: const TextStyle(fontSize: 18))),
+            decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.2), shape: BoxShape.circle),
+            child:
+                const Center(child: Text('👤', style: TextStyle(fontSize: 18))),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.studentName,
-                  style: AppTextStyles.chip.copyWith(color: AppColors.deepBlue, fontSize: 13)),
-              Text('wants: ${s.subject}', style: AppTextStyles.bodyMuted.copyWith(fontSize: 11)),
+                  style: AppTextStyles.chip
+                      .copyWith(color: AppColors.deepBlue, fontSize: 13)),
+              Text('wants: ${s.subject}',
+                  style: AppTextStyles.bodyMuted.copyWith(fontSize: 11)),
             ]),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.mustardYellow.withOpacity(0.15),
+              color: AppColors.mustardYellow.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(50),
             ),
             child: Text('⏳ Pending',
-                style: AppTextStyles.chip.copyWith(color: const Color(0xFF7A5C00), fontSize: 11)),
+                style: AppTextStyles.chip
+                    .copyWith(color: const Color(0xFF7A5C00), fontSize: 11)),
           ),
         ]),
       ),
@@ -482,7 +506,7 @@ class _EmptyCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.04), blurRadius: 10)
+                color: Colors.black.withValues(alpha: 0.04), blurRadius: 10)
           ],
         ),
         child: Column(children: [

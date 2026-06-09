@@ -19,8 +19,7 @@ class TutorTile extends StatelessWidget {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) =>
-                TutorDetailScreen(tutor: tutor, colorIndex: index),
+            builder: (_) => TutorDetailScreen(tutor: tutor, colorIndex: index),
           ),
         ),
         child: Container(
@@ -29,12 +28,12 @@ class TutorTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: accentColor.withOpacity(0.25),
+                color: accentColor.withValues(alpha: 0.25),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -54,19 +53,21 @@ class TutorTile extends StatelessWidget {
                       _SubjectChips(subjects: tutor.subjects, baseIndex: index),
                       const SizedBox(height: 14),
                       Row(children: [
-                        Icon(Icons.location_on_rounded, size: 14, color: accentColor),
+                        Icon(Icons.location_on_rounded,
+                            size: 14, color: accentColor),
                         const SizedBox(width: 4),
                         Text(tutor.city, style: AppTextStyles.bodyMuted),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: accentColor.withOpacity(0.15),
+                            color: accentColor.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
                             Text(
-                              '\$${tutor.ratePerHour.toStringAsFixed(0)}',
+                              'Rp ${tutor.ratePerHour.toStringAsFixed(0)}',
                               style: AppTextStyles.priceBadge.copyWith(
                                 fontSize: 16,
                                 color: Color.fromARGB(
@@ -111,39 +112,50 @@ class _AccentBanner extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [accentColor.withOpacity(0.18), accentColor.withOpacity(0.06)],
+          colors: [
+            accentColor.withValues(alpha: 0.18),
+            accentColor.withValues(alpha: 0.06)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
       child: Row(children: [
         Container(
-          width: 52, height: 52,
+          width: 52,
+          height: 52,
           decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
           child: Center(
             child: Text(
-              tutor.avatarEmoji.isEmpty ? _initials(tutor.name) : tutor.avatarEmoji,
+              tutor.avatarEmoji.isEmpty
+                  ? _initials(tutor.name)
+                  : tutor.avatarEmoji,
               style: const TextStyle(fontSize: 22),
             ),
           ),
         ),
         const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(tutor.name, style: AppTextStyles.cardTitle),
           const SizedBox(height: 2),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.3),
+              color: accentColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(50),
             ),
             child: Text('✦  Tutor',
-                style: AppTextStyles.chip.copyWith(color: AppColors.deepBlue.withOpacity(0.75))),
+                style: AppTextStyles.chip.copyWith(
+                    color: AppColors.deepBlue.withValues(alpha: 0.75))),
           ),
         ])),
         Column(children: [
           const Text('⭐', style: TextStyle(fontSize: 18)),
-          Text('${tutor.rating}', style: AppTextStyles.chip.copyWith(color: AppColors.deepBlue, fontSize: 11)),
+          Text('${tutor.rating}',
+              style: AppTextStyles.chip
+                  .copyWith(color: AppColors.deepBlue, fontSize: 11)),
         ]),
       ]),
     );
@@ -169,7 +181,8 @@ class _SubjectChips extends StatelessWidget {
             borderRadius: BorderRadius.circular(50),
           ),
           child: Text(subjects[i],
-              style: AppTextStyles.chip.copyWith(color: AppColors.chipTextColors[colorIdx])),
+              style: AppTextStyles.chip
+                  .copyWith(color: AppColors.chipTextColors[colorIdx])),
         );
       }),
     );

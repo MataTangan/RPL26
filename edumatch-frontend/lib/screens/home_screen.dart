@@ -44,13 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // ── AppBar ──────────────────────────────────────
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppColors.deepBlue,
                       borderRadius: BorderRadius.circular(50),
@@ -58,8 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('🎓',
-                            style: TextStyle(fontSize: 16)),
+                        const Text('🎓', style: TextStyle(fontSize: 16)),
                         const SizedBox(width: 6),
                         Text(
                           'EduMatch',
@@ -81,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.07),
+                          color: Colors.black.withValues(alpha: 0.07),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -114,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
+                          color: Colors.black.withValues(alpha: 0.06),
                           blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
@@ -157,8 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ].asMap().entries.map((e) {
                   final i = e.key;
                   final label = e.value;
-                  final color = AppColors.cardAccents[
-                      i % AppColors.cardAccents.length];
+                  final color =
+                      AppColors.cardAccents[i % AppColors.cardAccents.length];
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: GestureDetector(
@@ -175,10 +173,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.2),
+                          color: color.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(50),
                           border: Border.all(
-                              color: color.withOpacity(0.5), width: 1.5),
+                              color: color.withValues(alpha: 0.5), width: 1.5),
                         ),
                         child: Text(label,
                             style: AppTextStyles.chip
@@ -199,8 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('🔍',
-                              style: TextStyle(fontSize: 48)),
+                          const Text('🔍', style: TextStyle(fontSize: 48)),
                           const SizedBox(height: 10),
                           Text('No tutors found',
                               style: AppTextStyles.cardTitle),

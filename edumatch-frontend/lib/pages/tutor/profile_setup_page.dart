@@ -11,7 +11,7 @@ class TutorProfileSetupPage extends StatefulWidget {
 
 class _TutorProfileSetupPageState extends State<TutorProfileSetupPage> {
   final _bioCtrl = TextEditingController();
-  final _rateCtrl = TextEditingController(text: '75');
+  final _rateCtrl = TextEditingController(text: '75000');
   final _cityCtrl = TextEditingController(text: 'Jakarta');
   bool _saving = false;
   bool _saved = false;
@@ -66,42 +66,43 @@ class _TutorProfileSetupPageState extends State<TutorProfileSetupPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Column(children: [
+        child: SingleChildScrollView(
+          child: Column(children: [
           // ── Header ────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
-            child: Row(children: [
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('Profile Setup ✏️', style: AppTextStyles.displayBold),
                   const SizedBox(height: 4),
                   Text('Tell students who you are',
                       style: AppTextStyles.appBarSub),
                 ]),
-              ),
-              // Completion badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.mintGreen.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(50),
-                  border: Border.all(
-                      color: AppColors.mintGreen.withOpacity(0.4), width: 1.5),
+                // Completion badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.mintGreen.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(
+                        color: AppColors.mintGreen.withOpacity(0.4), width: 1.5),
+                  ),
+                  child: Text(
+                    '${_selected.length} subject${_selected.length == 1 ? '' : 's'}',
+                    style: AppTextStyles.chip
+                        .copyWith(color: const Color(0xFF006B63), fontSize: 12),
+                  ),
                 ),
-                child: Text(
-                  '${_selected.length} subject${_selected.length == 1 ? '' : 's'}',
-                  style: AppTextStyles.chip
-                      .copyWith(color: const Color(0xFF006B63), fontSize: 12),
-                ),
-              ),
-            ]),
+              ],
+            ),
           ),
           const SizedBox(height: 4),
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
                 // ── Avatar section ─────────────────────────────
                 _BentoCard(
@@ -205,7 +206,7 @@ class _TutorProfileSetupPageState extends State<TutorProfileSetupPage> {
                       Expanded(
                         child: _InlineField(
                           controller: _rateCtrl,
-                          hint: '75',
+                          hint: '75000',
                           accent: AppColors.brightOrange,
                           keyboardType: TextInputType.number,
                         ),
@@ -233,9 +234,9 @@ class _TutorProfileSetupPageState extends State<TutorProfileSetupPage> {
                         trackHeight: 4,
                       ),
                       child: Slider(
-                        value: double.tryParse(_rateCtrl.text) ?? 75,
-                        min: 30,
-                        max: 250,
+                        value: double.tryParse(_rateCtrl.text) ?? 75000,
+                        min: 30000,
+                        max: 250000,
                         onChanged: (v) =>
                             setState(() => _rateCtrl.text = v.toStringAsFixed(0)),
                       ),
@@ -344,50 +345,53 @@ class _TutorProfileSetupPageState extends State<TutorProfileSetupPage> {
                 ),
               ]),
             ),
-          ),
-        ]),
-      ),
 
-      // ── Floating save button ──────────────────────────────────
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: GestureDetector(
-          onTap: (_saving || _saved) ? null : _save,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 17),
-            decoration: BoxDecoration(
-              color: _saved ? AppColors.mintGreen : AppColors.deepBlue,
-              borderRadius: BorderRadius.circular(50),
-              boxShadow: [
-                BoxShadow(
-                  color: (_saved ? AppColors.mintGreen : AppColors.deepBlue)
-                      .withOpacity(0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Center(
-              child: _saving
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2.5),
-                    )
-                  : Text(
-                      _saved ? '✅  Profile Saved!' : '💾  Save Profile',
-                      style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                        color: Colors.white,
+            const SizedBox(height: 20),
+
+            // ── Save Profile button (inline) ──────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: GestureDetector(
+                onTap: (_saving || _saved) ? null : _save,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 17),
+                  decoration: BoxDecoration(
+                    color: _saved ? AppColors.mintGreen : AppColors.deepBlue,
+                    borderRadius: BorderRadius.circular(50),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (_saved ? AppColors.mintGreen : AppColors.deepBlue)
+                            .withOpacity(0.4),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
-                    ),
+                    ],
+                  ),
+                  child: Center(
+                    child: _saving
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2.5),
+                          )
+                        : Text(
+                            _saved ? '✅  Profile Saved!' : '💾  Save Profile',
+                            style: GoogleFonts.nunito(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
             ),
-          ),
+
+            const SizedBox(height: 120),
+          ]),
         ),
       ),
     );

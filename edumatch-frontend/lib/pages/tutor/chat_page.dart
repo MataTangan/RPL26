@@ -3,17 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../theme.dart';
 
 // ─── Mock message model ───────────────────────────────────────────────────────
-class _ChatMessage {
+class TutorChatMessage {
   final String text;
   final bool isMe; // true = tutor (me), false = student
   final String time;
-  const _ChatMessage(
+  const TutorChatMessage(
       {required this.text, required this.isMe, required this.time});
 }
 
 // ─── Mock student conversations ───────────────────────────────────────────────
-final _mockConversations = [
-  _Conversation(
+final mockTutorConversations = [
+  TutorConversation(
     studentName: 'Rizky Maulana',
     studentEmoji: '👦',
     lastMsg: 'Siap! Saya tunggu konfirmasinya ya, Bu.',
@@ -21,29 +21,29 @@ final _mockConversations = [
     unread: 1,
     accent: AppColors.mustardYellow,
     messages: const [
-      _ChatMessage(
+      TutorChatMessage(
           text: 'Halo Bu Aisha! Boleh tanya soal Kalkulus diferensial?',
           isMe: false,
           time: '09:10'),
-      _ChatMessage(
+      TutorChatMessage(
           text: 'Tentu Rizky! Bagian mana yang masih bingung?',
           isMe: true,
           time: '09:11'),
-      _ChatMessage(
+      TutorChatMessage(
           text: 'Turunan fungsi komposit, Bu. Sering keliru tanda.',
           isMe: false,
           time: '09:12'),
-      _ChatMessage(
+      TutorChatMessage(
           text: 'Oke, kita latihan Chain Rule ya di sesi Senin.',
           isMe: true,
           time: '09:14'),
-      _ChatMessage(
+      TutorChatMessage(
           text: 'Siap! Saya tunggu konfirmasinya ya, Bu.',
           isMe: false,
           time: '09:18'),
     ],
   ),
-  _Conversation(
+  TutorConversation(
     studentName: 'Siti Nurhaliza',
     studentEmoji: '👧',
     lastMsg: 'Terima kasih banyak Bu! 🙏',
@@ -51,16 +51,16 @@ final _mockConversations = [
     unread: 0,
     accent: AppColors.mintGreen,
     messages: const [
-      _ChatMessage(
+      TutorChatMessage(
           text: 'Selamat pagi Bu! Jadwal IELTS Writing jadi hari apa?',
           isMe: false,
           time: '08:30'),
-      _ChatMessage(
+      TutorChatMessage(
           text: 'Jumat jam 09:00 ya Siti. Sudah saya konfirmasi.',
           isMe: true,
           time: '08:40'),
-      _ChatMessage(
-          text: 'Terima kasih banyak Bu! 🙏',
+      TutorChatMessage(
+          text: 'Terima kasih Bu!',
           isMe: false,
           time: '08:45'),
     ],
@@ -69,12 +69,12 @@ final _mockConversations = [
 
 // ─── Data classes ─────────────────────────────────────────────────────────────
 
-class _Conversation {
+class TutorConversation {
   final String studentName, studentEmoji, lastMsg, time;
   final int unread;
   final Color accent;
-  final List<_ChatMessage> messages;
-  const _Conversation({
+  final List<TutorChatMessage> messages;
+  const TutorConversation({
     required this.studentName,
     required this.studentEmoji,
     required this.lastMsg,
@@ -167,9 +167,9 @@ class TutorChatPage extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _mockConversations.length,
+              itemCount: mockTutorConversations.length,
               itemBuilder: (_, i) {
-                final conv = _mockConversations[i];
+                final conv = mockTutorConversations[i];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: GestureDetector(
@@ -177,7 +177,7 @@ class TutorChatPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            _TutorChatDetailPage(conversation: conv),
+                            TutorChatDetailPage(conversation: conv),
                       ),
                     ),
                     child: Container(
@@ -282,19 +282,19 @@ class TutorChatPage extends StatelessWidget {
 
 // ─── Chat detail page ─────────────────────────────────────────────────────────
 
-class _TutorChatDetailPage extends StatefulWidget {
-  final _Conversation conversation;
-  const _TutorChatDetailPage({required this.conversation});
+class TutorChatDetailPage extends StatefulWidget {
+  final TutorConversation conversation;
+  const TutorChatDetailPage({super.key, required this.conversation});
 
   @override
-  State<_TutorChatDetailPage> createState() => _TutorChatDetailPageState();
+  State<TutorChatDetailPage> createState() => _TutorChatDetailPageState();
 }
 
-class _TutorChatDetailPageState extends State<_TutorChatDetailPage>
+class _TutorChatDetailPageState extends State<TutorChatDetailPage>
     with SingleTickerProviderStateMixin {
   final _msgCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
-  late List<_ChatMessage> _messages;
+  late List<TutorChatMessage> _messages;
   bool _typing = false;
 
   late AnimationController _dotCtrl;
@@ -323,7 +323,7 @@ class _TutorChatDetailPageState extends State<_TutorChatDetailPage>
     final timeStr =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     setState(() {
-      _messages.add(_ChatMessage(text: text, isMe: true, time: timeStr));
+      _messages.add(TutorChatMessage(text: text, isMe: true, time: timeStr));
       _msgCtrl.clear();
       _typing = true;
     });
@@ -333,7 +333,7 @@ class _TutorChatDetailPageState extends State<_TutorChatDetailPage>
       if (!mounted) return;
       setState(() {
         _typing = false;
-        _messages.add(const _ChatMessage(
+        _messages.add(const TutorChatMessage(
             text: 'Terima kasih! Saya akan segera membalas lebih lengkap ya.',
             isMe: false,
             time: ''));
@@ -537,7 +537,7 @@ class _TutorChatDetailPageState extends State<_TutorChatDetailPage>
 // ─── Chat bubble ─────────────────────────────────────────────────────────────
 
 class _Bubble extends StatelessWidget {
-  final _ChatMessage message;
+  final TutorChatMessage message;
   final Color accent;
   const _Bubble({required this.message, required this.accent});
 

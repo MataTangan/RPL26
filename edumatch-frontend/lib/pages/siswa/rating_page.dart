@@ -101,14 +101,13 @@ class _SiswaRatingPageState extends State<SiswaRatingPage> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: widget.accent.withOpacity(0.4),
+              color: widget.accent.withValues(alpha: 0.4),
               blurRadius: 18,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: const Center(
-            child: Text('⭐', style: TextStyle(fontSize: 32))),
+        child: const Center(child: Text('⭐', style: TextStyle(fontSize: 32))),
       ),
       const SizedBox(height: 16),
       Text(
@@ -137,7 +136,7 @@ class _SiswaRatingPageState extends State<SiswaRatingPage> {
               height: 52,
               decoration: BoxDecoration(
                 color: filled
-                    ? AppColors.mustardYellow.withOpacity(0.2)
+                    ? AppColors.mustardYellow.withValues(alpha: 0.2)
                     : Colors.grey.shade100,
                 shape: BoxShape.circle,
               ),
@@ -160,9 +159,8 @@ class _SiswaRatingPageState extends State<SiswaRatingPage> {
           style: GoogleFonts.nunito(
             fontWeight: FontWeight.w800,
             fontSize: 16,
-            color: _stars > 0
-                ? const Color(0xFF7A5C00)
-                : const Color(0xFF9E9EB0),
+            color:
+                _stars > 0 ? const Color(0xFF7A5C00) : const Color(0xFF9E9EB0),
           ),
         ),
       ),
@@ -175,7 +173,7 @@ class _SiswaRatingPageState extends State<SiswaRatingPage> {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: widget.accent.withOpacity(0.12),
+              color: widget.accent.withValues(alpha: 0.12),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -213,7 +211,7 @@ class _SiswaRatingPageState extends State<SiswaRatingPage> {
             boxShadow: _stars > 0
                 ? [
                     BoxShadow(
-                      color: widget.accent.withOpacity(0.4),
+                      color: widget.accent.withValues(alpha: 0.4),
                       blurRadius: 18,
                       offset: const Offset(0, 8),
                     )
@@ -259,14 +257,13 @@ class _SiswaRatingPageState extends State<SiswaRatingPage> {
       GestureDetector(
         onTap: () => Navigator.pop(context),
         child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 36, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 16),
           decoration: BoxDecoration(
             color: AppColors.mintGreen,
             borderRadius: BorderRadius.circular(50),
             boxShadow: [
               BoxShadow(
-                color: AppColors.mintGreen.withOpacity(0.4),
+                color: AppColors.mintGreen.withValues(alpha: 0.4),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               )
@@ -275,9 +272,7 @@ class _SiswaRatingPageState extends State<SiswaRatingPage> {
           child: Text(
             'Done',
             style: GoogleFonts.nunito(
-                fontWeight: FontWeight.w900,
-                fontSize: 15,
-                color: Colors.white),
+                fontWeight: FontWeight.w900, fontSize: 15, color: Colors.white),
           ),
         ),
       ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/tutor.dart';
+import '../../models/booking_session.dart';
+import '../../services/mock_data.dart';
 import '../../theme.dart';
+import '../../widgets/payment_bottom_sheet.dart';
 import 'rating_page.dart';
 
 class SiswaTutorDetailPage extends StatefulWidget {
@@ -16,7 +19,6 @@ class SiswaTutorDetailPage extends StatefulWidget {
 
 class _SiswaTutorDetailPageState extends State<SiswaTutorDetailPage> {
   String? _selectedSlot;
-  bool _isBooking = false;
   bool _booked = false;
 
   Color get _accent =>
@@ -48,13 +50,56 @@ class _SiswaTutorDetailPageState extends State<SiswaTutorDetailPage> {
   ];
 
   Future<void> _book() async {
-    setState(() => _isBooking = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-    setState(() {
-      _isBooking = false;
-      _booked = true;
-    });
+    final tutor = widget.tutor;
+
+    // Open the payment bottom sheet
+    final paid = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => PaymentBottomSheet(
+        amount: tutor.ratePerHour,
+        accent: _accent,
+      ),
+    );
+
+    if (paid != true || !mounted) return;
+
+    // Payment succeeded — persist the booking offline
+    final slot = _selectedSlot!;
+    final datePart = slot.split('  ').first.trim();
+    final timePart = slot.contains('  ')
+        ? slot.split('  ').last.trim()
+        : slot;
+
+    MockData.addBooking(BookingSession(
+      id: MockData.nextId(),
+      tutorId: tutor.id,
+      tutorName: tutor.name,
+      studentName: 'Rizky Maulana',
+      subject: tutor.subjects.first,
+      date: datePart,
+      timeSlot: timePart,
+      ratePerHour: tutor.ratePerHour,
+      status: SessionStatus.active,
+      tutorAvatarEmoji: tutor.avatarEmoji,
+    ));
+
+    setState(() => _booked = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '🎉 Session with ${tutor.name} booked!',
+          style: GoogleFonts.nunito(
+              fontWeight: FontWeight.w700, color: Colors.white),
+        ),
+        backgroundColor: AppColors.mintGreen,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 80),
+      ),
+    );
   }
 
   @override
@@ -90,26 +135,7 @@ class _SiswaTutorDetailPageState extends State<SiswaTutorDetailPage> {
                 ),
               ),
             ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 10)
-                    ],
-                  ),
-                  child: Icon(Icons.favorite_border_rounded,
-                      size: 20, color: _accent),
-                ),
-              ),
-            ],
+            actions: const [],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
@@ -410,7 +436,7 @@ class _SiswaTutorDetailPageState extends State<SiswaTutorDetailPage> {
                     const SizedBox(width: 18),
                     Expanded(
                       child: GestureDetector(
-                        onTap: (_selectedSlot == null || _isBooking)
+                        onTap: _selectedSlot == null
                             ? null
                             : _book,
                         child: AnimatedContainer(
@@ -433,18 +459,10 @@ class _SiswaTutorDetailPageState extends State<SiswaTutorDetailPage> {
                                 : [],
                           ),
                           child: Center(
-                            child: _isBooking
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2.5),
-                                  )
-                                : Text(
+                            child: Text(
                                     _selectedSlot == null
                                         ? 'Select a Slot First'
-                                        : '🎉  Book Session',
+                                        : '💳  Book & Pay',
                                     style: GoogleFonts.nunito(
                                       fontWeight: FontWeight.w900,
                                       fontSize: 16,

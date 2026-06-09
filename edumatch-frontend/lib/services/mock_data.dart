@@ -1,14 +1,23 @@
 import '../models/tutor.dart';
 import '../models/booking_session.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  MockData — In-memory "database" for the Standalone MVP demo.
+//  All data lives here and is manipulated via static helper methods.
+//  No network calls, no backend required.
+// ─────────────────────────────────────────────────────────────────────────────
+
 abstract class MockData {
+  // ─── Auto-increment ID counter ──────────────────────────────────────────
+  static int _nextSessionId = 400;
+
   // ─── Tutors ────────────────────────────────────────────────────────────────
   static final List<Tutor> tutors = [
     const Tutor(
       id: 1,
       name: 'Aisha Rahma',
       subjects: ['Mathematics', 'Physics', 'Calculus'],
-      ratePerHour: 85,
+      ratePerHour: 85000,
       city: 'Jakarta',
       bio:
           'Passionate STEM educator with 6 years of experience helping students '
@@ -30,7 +39,7 @@ abstract class MockData {
       id: 2,
       name: 'Budi Santoso',
       subjects: ['English', 'Literature', 'IELTS Prep'],
-      ratePerHour: 70,
+      ratePerHour: 70000,
       city: 'Bandung',
       bio:
           'Certified English teacher and IELTS coach with a band score of 8.5. '
@@ -51,7 +60,7 @@ abstract class MockData {
       id: 3,
       name: 'Clara Dewi',
       subjects: ['Chemistry', 'Biology', 'Science'],
-      ratePerHour: 90,
+      ratePerHour: 90000,
       city: 'Surabaya',
       bio:
           'PhD candidate in Biochemistry at ITS. I make complex science concepts '
@@ -72,7 +81,7 @@ abstract class MockData {
       id: 4,
       name: 'David Kurnia',
       subjects: ['Programming', 'Python', 'Web Dev'],
-      ratePerHour: 120,
+      ratePerHour: 120000,
       city: 'Yogyakarta',
       bio:
           'Full-stack developer turned educator. I teach Python, JavaScript, and '
@@ -94,7 +103,7 @@ abstract class MockData {
       id: 5,
       name: 'Eka Putri',
       subjects: ['Indonesian', 'History', 'Social Studies'],
-      ratePerHour: 60,
+      ratePerHour: 60000,
       city: 'Medan',
       bio: 'Dedicated humanities teacher with 8 years in secondary education. '
           'I specialise in making history and social studies come alive through '
@@ -114,7 +123,7 @@ abstract class MockData {
       id: 6,
       name: 'Fariz Hakim',
       subjects: ['Music Theory', 'Guitar', 'Piano'],
-      ratePerHour: 75,
+      ratePerHour: 75000,
       city: 'Bali',
       bio: 'Professional musician and conservatory graduate. Whether you are a '
           'complete beginner or working on advanced repertoire, I will guide you '
@@ -132,7 +141,10 @@ abstract class MockData {
     ),
   ];
 
-  // ─── Booking Sessions ──────────────────────────────────────────────────────
+  // ─── Session History (For Offline Demo MVP) ────────────────────────────────
+  static List<BookingSession> sessionHistory = [];
+
+  // ─── Booking Sessions (mutable — new bookings are added at runtime) ────────
   static final List<BookingSession> sessions = [
     // ── Active (Upcoming) ──────────────────────────────────────────────────
     const BookingSession(
@@ -143,7 +155,7 @@ abstract class MockData {
       subject: 'Mathematics',
       date: 'Mon, 26 May 2026',
       timeSlot: '09:00 – 10:00',
-      ratePerHour: 85,
+      ratePerHour: 85000,
       status: SessionStatus.active,
       tutorAvatarEmoji: '🌟',
     ),
@@ -155,7 +167,7 @@ abstract class MockData {
       subject: 'Python',
       date: 'Wed, 28 May 2026',
       timeSlot: '19:00 – 20:00',
-      ratePerHour: 120,
+      ratePerHour: 120000,
       status: SessionStatus.active,
       tutorAvatarEmoji: '💻',
     ),
@@ -168,7 +180,7 @@ abstract class MockData {
       subject: 'IELTS Prep',
       date: 'Fri, 30 May 2026',
       timeSlot: '09:00 – 10:00',
-      ratePerHour: 70,
+      ratePerHour: 70000,
       status: SessionStatus.pending,
       tutorAvatarEmoji: '📖',
     ),
@@ -180,7 +192,7 @@ abstract class MockData {
       subject: 'Chemistry',
       date: 'Sat, 31 May 2026',
       timeSlot: '13:00 – 14:00',
-      ratePerHour: 90,
+      ratePerHour: 90000,
       status: SessionStatus.pending,
       tutorAvatarEmoji: '🔬',
     ),
@@ -192,7 +204,7 @@ abstract class MockData {
       subject: 'History',
       date: 'Sun, 01 Jun 2026',
       timeSlot: '14:00 – 15:00',
-      ratePerHour: 60,
+      ratePerHour: 60000,
       status: SessionStatus.pending,
       tutorAvatarEmoji: '🏛️',
     ),
@@ -205,7 +217,7 @@ abstract class MockData {
       subject: 'Physics',
       date: 'Mon, 12 May 2026',
       timeSlot: '14:00 – 15:00',
-      ratePerHour: 85,
+      ratePerHour: 85000,
       status: SessionStatus.past,
       tutorAvatarEmoji: '🌟',
     ),
@@ -217,9 +229,49 @@ abstract class MockData {
       subject: 'Guitar',
       date: 'Sat, 10 May 2026',
       timeSlot: '11:00 – 12:00',
-      ratePerHour: 75,
+      ratePerHour: 75000,
       status: SessionStatus.past,
       tutorAvatarEmoji: '🎸',
     ),
   ];
+
+  // ─── Helper Methods (in-memory data manipulation) ──────────────────────────
+
+  /// Adds a new booking to the in-memory session list.
+  static void addBooking(BookingSession session) {
+    sessions.insert(0, session); // newest first
+    sessionHistory.insert(0, session); // add to offline MVP history
+  }
+
+  /// Generates the next unique session ID.
+  static int nextId() => _nextSessionId++;
+
+  /// Finds a tutor by their ID, or returns `null`.
+  static Tutor? findTutorById(int id) {
+    try {
+      return tutors.firstWhere((t) => t.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Updates the status of a session by ID. Returns `true` if found.
+  static bool updateSessionStatus(int sessionId, SessionStatus newStatus) {
+    final index = sessions.indexWhere((s) => s.id == sessionId);
+    if (index == -1) return false;
+    final old = sessions[index];
+    sessions[index] = BookingSession(
+      id: old.id,
+      tutorId: old.tutorId,
+      tutorName: old.tutorName,
+      studentName: old.studentName,
+      subject: old.subject,
+      date: old.date,
+      timeSlot: old.timeSlot,
+      ratePerHour: old.ratePerHour,
+      status: newStatus,
+      tutorAvatarEmoji: old.tutorAvatarEmoji,
+    );
+    return true;
+  }
 }

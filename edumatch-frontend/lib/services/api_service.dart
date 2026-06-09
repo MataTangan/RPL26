@@ -1,186 +1,95 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/tutor.dart';
 import '../models/booking_session.dart';
-import '../config/env.dart';
 import 'mock_data.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  ApiService
-//  Provides reusable HTTP helpers that automatically inject the saved JWT
-//  token into every request.  All data methods respect the [useMockData] flag.
+//  ApiService — Standalone MVP (100% Offline)
+//  All methods return data from MockData with a simulated network delay.
+//  No HTTP calls, no backend dependency.
 // ─────────────────────────────────────────────────────────────────────────────
 
 class ApiService {
-  // ── Token retrieval ────────────────────────────────────────────────────────
-
-  /// Reads the saved JWT token from SharedPreferences.
-  static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('edumatch_token');
-  }
-
-  // ── Authenticated HTTP helpers ─────────────────────────────────────────────
-
-  /// Builds the standard request headers, injecting the Bearer token
-  /// if one is available in SharedPreferences.
-  static Future<Map<String, String>> _authHeaders({
-    bool contentTypeJson = false,
-  }) async {
-    final token = await getToken();
-    return {
-      if (contentTypeJson) 'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
-  }
-
-  /// Authenticated GET request to [path] (relative to [apiBase]).
-  static Future<http.Response> get(String path) async {
-    final headers = await _authHeaders();
-    return http.get(
-      Uri.parse('$apiBase$path'),
-      headers: headers,
-    );
-  }
-
-  /// Authenticated POST request to [path] with a JSON [body].
-  static Future<http.Response> post(
-    String path,
-    Map<String, dynamic> body,
-  ) async {
-    final headers = await _authHeaders(contentTypeJson: true);
-    return http.post(
-      Uri.parse('$apiBase$path'),
-      headers: headers,
-      body: json.encode(body),
-    );
-  }
-
-  /// Authenticated PUT request to [path] with a JSON [body].
-  static Future<http.Response> put(
-    String path,
-    Map<String, dynamic> body,
-  ) async {
-    final headers = await _authHeaders(contentTypeJson: true);
-    return http.put(
-      Uri.parse('$apiBase$path'),
-      headers: headers,
-      body: json.encode(body),
-    );
-  }
-
-  /// Authenticated PATCH request to [path] with an optional JSON [body].
-  static Future<http.Response> patch(
-    String path, [
-    Map<String, dynamic>? body,
-  ]) async {
-    final headers = await _authHeaders(contentTypeJson: body != null);
-    return http.patch(
-      Uri.parse('$apiBase$path'),
-      headers: headers,
-      body: body != null ? json.encode(body) : null,
-    );
-  }
+  /// Simulated network latency (feels realistic to investors).
+  static const _delay = Duration(seconds: 1);
 
   // ─── Tutors ───────────────────────────────────────────────────────────────
 
-  /// Fetch all tutors.
-  ///
-  /// Returns [MockData.tutors] after a simulated delay when [useMockData] is
-  /// `true`; otherwise performs a real GET request to `[apiBase]/api/tutors`.
+  /// Returns the full list of mock tutors after a simulated delay.
   static Future<List<Tutor>> fetchTutors() async {
-    if (useMockData) {
-      await Future.delayed(mockDelay);
-      return MockData.tutors;
-    }
+    await Future.delayed(_delay);
+    return MockData.tutors;
+  }
 
-    final res = await get('/api/tutors');
-    if (res.statusCode == 200) {
-      final body = json.decode(res.body);
-      final list = (body['data'] as List).cast<Map<String, dynamic>>();
-      return list.map((e) => Tutor.fromJson(e)).toList();
-    }
-    throw Exception('fetchTutors failed — HTTP ${res.statusCode}');
+  /// Returns a single tutor by [id] from the mock list.
+  static Future<Tutor> fetchTutorById(int id) async {
+    await Future.delayed(_delay);
+    final tutor = MockData.findTutorById(id);
+    if (tutor != null) return tutor;
+    throw Exception('Tutor $id not found');
   }
 
   // ─── Booking Sessions ─────────────────────────────────────────────────────
 
-  /// Fetch all booking sessions for the current user.
-  ///
-  /// Returns [MockData.sessions] after a simulated delay when [useMockData] is
-  /// `true`; otherwise performs an authenticated GET to `[apiBase]/api/sessions`.
+  /// Returns all booking sessions from the in-memory mock list.
   static Future<List<BookingSession>> fetchSessions() async {
-    if (useMockData) {
-      await Future.delayed(mockDelay);
-      return MockData.sessions;
-    }
-
-    final res = await get('/api/sessions');
-    if (res.statusCode == 200) {
-      final body = json.decode(res.body);
-      final list = (body['data'] as List).cast<Map<String, dynamic>>();
-      return list.map((e) => BookingSession.fromJson(e)).toList();
-    }
-    throw Exception('fetchSessions failed — HTTP ${res.statusCode}');
+    await Future.delayed(_delay);
+    return MockData.sessions;
   }
 
-  /// Fetch a single tutor by [id].
-  static Future<Tutor> fetchTutorById(int id) async {
-    if (useMockData) {
-      await Future.delayed(mockDelay);
-      return MockData.tutors.firstWhere(
-        (t) => t.id == id,
-        orElse: () => throw Exception('Tutor $id not found in mock data'),
-      );
-    }
-
-    final res = await get('/api/tutors/$id');
-    if (res.statusCode == 200) {
-      return Tutor.fromJson(json.decode(res.body)['data']);
-    }
-    throw Exception('fetchTutorById($id) failed — HTTP ${res.statusCode}');
+  /// Alias for [fetchSessions] — used by some UI pages.
+  static Future<List<BookingSession>> fetchBookingHistory() async {
+    await Future.delayed(_delay);
+    return MockData.sessionHistory.isNotEmpty 
+        ? MockData.sessionHistory 
+        : MockData.sessions; // fallback to dummy list if history is empty
   }
 
-  /// Submit a new booking request.
-  ///
-  /// [tutorId]  — ID of the selected tutor.
-  /// [slot]     — The chosen time-slot string.
-  /// [subject]  — Subject to study.
-  ///
-  /// Returns `true` on success.
+  /// Creates a new booking and adds it to the in-memory list.
+  /// Always returns `true` (success).
   static Future<bool> createBooking({
     required int tutorId,
     required String slot,
     required String subject,
   }) async {
-    if (useMockData) {
-      await Future.delayed(mockDelay * 2);
-      return true;
-    }
+    await Future.delayed(const Duration(milliseconds: 1500));
 
-    final res = await post('/api/bookings', {
-      'tutorId': tutorId,
-      'slot': slot,
-      'subject': subject,
-    });
-    if (res.statusCode == 201) return true;
-    throw Exception('createBooking failed — HTTP ${res.statusCode}');
+    final tutor = MockData.findTutorById(tutorId);
+    final session = BookingSession(
+      id: MockData.nextId(),
+      tutorId: tutorId,
+      tutorName: tutor?.name ?? 'Unknown Tutor',
+      studentName: 'Rizky Maulana', // demo user
+      subject: subject,
+      date: _formatToday(),
+      timeSlot: slot,
+      ratePerHour: tutor?.ratePerHour ?? 0,
+      status: SessionStatus.pending,
+      tutorAvatarEmoji: tutor?.avatarEmoji ?? '🎓',
+    );
+
+    MockData.addBooking(session);
+    return true;
   }
 
   /// Accept or reject a pending booking (tutor action).
-  ///
-  /// [accept] — `true` to accept, `false` to decline.
   static Future<bool> respondToBooking(int sessionId,
       {required bool accept}) async {
-    if (useMockData) {
-      await Future.delayed(mockDelay);
-      return true;
-    }
+    await Future.delayed(_delay);
+    final newStatus = accept ? SessionStatus.active : SessionStatus.past;
+    return MockData.updateSessionStatus(sessionId, newStatus);
+  }
 
-    final action = accept ? 'accept' : 'decline';
-    final res = await patch('/api/bookings/$sessionId/$action');
-    if (res.statusCode == 200) return true;
-    throw Exception('respondToBooking($sessionId) failed — HTTP ${res.statusCode}');
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  /// Returns a nicely formatted date string for today (used for new bookings).
+  static String _formatToday() {
+    final now = DateTime.now();
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${days[now.weekday - 1]}, ${now.day.toString().padLeft(2, '0')} '
+        '${months[now.month - 1]} ${now.year}';
   }
 }

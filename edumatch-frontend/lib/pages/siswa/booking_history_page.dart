@@ -31,8 +31,9 @@ class _SiswaBookingHistoryPageState extends State<SiswaBookingHistoryPage>
 
   List<BookingSession> get _upcoming =>
       MockData.sessions.where((s) => s.status == SessionStatus.active).toList();
-  List<BookingSession> get _pending =>
-      MockData.sessions.where((s) => s.status == SessionStatus.pending).toList();
+  List<BookingSession> get _pending => MockData.sessions
+      .where((s) => s.status == SessionStatus.pending)
+      .toList();
   List<BookingSession> get _past =>
       MockData.sessions.where((s) => s.status == SessionStatus.past).toList();
 
@@ -45,7 +46,8 @@ class _SiswaBookingHistoryPageState extends State<SiswaBookingHistoryPage>
           // ── Header ─────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('My Sessions 📅', style: AppTextStyles.displayBold),
               const SizedBox(height: 4),
               Text('Track upcoming, pending & completed sessions',
@@ -61,7 +63,8 @@ class _SiswaBookingHistoryPageState extends State<SiswaBookingHistoryPage>
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05), blurRadius: 10)
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10)
                   ],
                 ),
                 child: TabBar(
@@ -92,9 +95,19 @@ class _SiswaBookingHistoryPageState extends State<SiswaBookingHistoryPage>
             child: TabBarView(
               controller: _tab,
               children: [
-                _SessionList(sessions: _upcoming, emptyMsg: 'No upcoming sessions!', emptyEmoji: '🗓️'),
-                _SessionList(sessions: _pending, emptyMsg: 'No pending sessions!', emptyEmoji: '⏳'),
-                _SessionList(sessions: _past, emptyMsg: 'No completed sessions yet.', emptyEmoji: '✅', showRate: true),
+                _SessionList(
+                    sessions: _upcoming,
+                    emptyMsg: 'No upcoming sessions!',
+                    emptyEmoji: '🗓️'),
+                _SessionList(
+                    sessions: _pending,
+                    emptyMsg: 'No pending sessions!',
+                    emptyEmoji: '⏳'),
+                _SessionList(
+                    sessions: _past,
+                    emptyMsg: 'No completed sessions yet.',
+                    emptyEmoji: '✅',
+                    showRate: true),
               ],
             ),
           ),
@@ -185,8 +198,7 @@ class _SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent =
-        AppColors.cardAccents[index % AppColors.cardAccents.length];
+    final accent = AppColors.cardAccents[index % AppColors.cardAccents.length];
     final s = session;
 
     return Padding(
@@ -198,7 +210,7 @@ class _SessionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: accent.withOpacity(0.18),
+              color: accent.withValues(alpha: 0.18),
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),
@@ -210,8 +222,7 @@ class _SessionCard extends StatelessWidget {
             Container(
               width: 54,
               height: 54,
-              decoration:
-                  BoxDecoration(color: accent, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
               child: Center(
                 child: Text(s.tutorAvatarEmoji,
                     style: const TextStyle(fontSize: 24)),
@@ -224,15 +235,14 @@ class _SessionCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(s.tutorName,
-                        style:
-                            AppTextStyles.cardTitle.copyWith(fontSize: 15)),
+                        style: AppTextStyles.cardTitle.copyWith(fontSize: 15)),
                     const SizedBox(height: 2),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.chipColors[
-                            index % AppColors.chipColors.length],
+                        color: AppColors
+                            .chipColors[index % AppColors.chipColors.length],
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Text(
@@ -249,10 +259,10 @@ class _SessionCard extends StatelessWidget {
             // Status badge
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: _statusColor(s.status).withOpacity(0.18),
+                  color: _statusColor(s.status).withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -280,7 +290,7 @@ class _SessionCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             decoration: BoxDecoration(
-              color: accent.withOpacity(0.1),
+              color: accent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(children: [
@@ -292,8 +302,8 @@ class _SessionCard extends StatelessWidget {
               const Text('⏰', style: TextStyle(fontSize: 13)),
               const SizedBox(width: 6),
               Text(s.timeSlot,
-                  style: AppTextStyles.chip.copyWith(
-                      color: AppColors.deepBlue, fontSize: 12)),
+                  style: AppTextStyles.chip
+                      .copyWith(color: AppColors.deepBlue, fontSize: 12)),
             ]),
           ),
 
@@ -314,10 +324,10 @@ class _SessionCard extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 11),
                 decoration: BoxDecoration(
-                  color: AppColors.mustardYellow.withOpacity(0.15),
+                  color: AppColors.mustardYellow.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                      color: AppColors.mustardYellow.withOpacity(0.4),
+                      color: AppColors.mustardYellow.withValues(alpha: 0.4),
                       width: 1.5),
                 ),
                 child: Center(

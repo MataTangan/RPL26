@@ -47,7 +47,7 @@ class _MainNavState extends State<MainNav> {
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 24,
                 offset: const Offset(0, -4),
               ),
@@ -58,7 +58,8 @@ class _MainNavState extends State<MainNav> {
             children: List.generate(_items.length, (i) {
               final item = _items[i];
               final active = i == _index;
-              final accent = AppColors.cardAccents[i % AppColors.cardAccents.length];
+              final accent =
+                  AppColors.cardAccents[i % AppColors.cardAccents.length];
               return Expanded(
                 child: GestureDetector(
                   onTap: () => setState(() => _index = i),
@@ -66,9 +67,12 @@ class _MainNavState extends State<MainNav> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                     decoration: BoxDecoration(
-                      color: active ? accent.withOpacity(0.18) : Colors.transparent,
+                      color: active
+                          ? accent.withValues(alpha: 0.18)
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Column(
@@ -85,7 +89,9 @@ class _MainNavState extends State<MainNav> {
                             fontWeight:
                                 active ? FontWeight.w800 : FontWeight.w600,
                             fontSize: 10,
-                            color: active ? AppColors.deepBlue : const Color(0xFFAAAAAA),
+                            color: active
+                                ? AppColors.deepBlue
+                                : const Color(0xFFAAAAAA),
                           ),
                           child: Text(item.label),
                         ),

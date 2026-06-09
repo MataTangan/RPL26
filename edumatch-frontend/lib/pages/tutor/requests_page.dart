@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/booking_session.dart';
 import '../../services/mock_data.dart';
 import '../../theme.dart';
+import 'chat_page.dart';
 
 class TutorRequestsPage extends StatefulWidget {
   const TutorRequestsPage({super.key});
@@ -290,20 +291,40 @@ class _RequestCard extends StatelessWidget {
             ])
           else
             // ── Post-accept CTA ────────────────────────────────
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              decoration: BoxDecoration(
-                color: AppColors.mintGreen.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(50),
-                border: Border.all(
-                    color: AppColors.mintGreen.withOpacity(0.3), width: 1.5),
-              ),
-              child: Center(
-                child: Text(
-                  '💬  Send a message to ${s.studentName.split(' ').first}',
-                  style: AppTextStyles.chip
-                      .copyWith(color: const Color(0xFF006B63), fontSize: 13),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => TutorChatDetailPage(
+                      conversation: TutorConversation(
+                        studentName: s.studentName,
+                        studentEmoji: '👦', // Default emoji for new chats
+                        lastMsg: 'Booking accepted!',
+                        time: '',
+                        unread: 0,
+                        accent: AppColors.mintGreen,
+                        messages: [],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                decoration: BoxDecoration(
+                  color: AppColors.mintGreen.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(
+                      color: AppColors.mintGreen.withOpacity(0.3), width: 1.5),
+                ),
+                child: Center(
+                  child: Text(
+                    '💬  Send a message to ${s.studentName.split(' ').first}',
+                    style: AppTextStyles.chip
+                        .copyWith(color: const Color(0xFF006B63), fontSize: 13),
+                  ),
                 ),
               ),
             ),

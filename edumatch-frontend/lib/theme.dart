@@ -11,14 +11,14 @@ abstract class AppColors {
   static const Color surface = Color(0xFFFFFFFF);
 
   // Brand
-  static const Color deepBlue = Color(0xFF1A237E);   // dark headline ink
+  static const Color deepBlue = Color(0xFF1A237E); // dark headline ink
 
   // Accent palette – used to colour Bento cards
   static const Color mustardYellow = Color(0xFFFFC94A);
-  static const Color brightOrange  = Color(0xFFFF6B35);
-  static const Color mintGreen     = Color(0xFF4ECDC4);
-  static const Color pastelPurple  = Color(0xFFB48FE0);
-  static const Color skyBlue       = Color(0xFF5BA4CF);
+  static const Color brightOrange = Color(0xFFFF6B35);
+  static const Color mintGreen = Color(0xFF4ECDC4);
+  static const Color pastelPurple = Color(0xFFB48FE0);
+  static const Color skyBlue = Color(0xFF5BA4CF);
 
   // Ordered list for systematic card colouring
   static const List<Color> cardAccents = [
@@ -114,11 +114,10 @@ ThemeData buildAppTheme() {
   return ThemeData(
     useMaterial3: true,
     scaffoldBackgroundColor: AppColors.background,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: AppColors.deepBlue,
       secondary: AppColors.mustardYellow,
       surface: AppColors.surface,
-      background: AppColors.background,
     ),
     textTheme: GoogleFonts.nunitoTextTheme(),
     appBarTheme: const AppBarTheme(

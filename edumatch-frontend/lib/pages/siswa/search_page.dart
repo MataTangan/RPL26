@@ -17,6 +17,7 @@ class _SiswaSearchPageState extends State<SiswaSearchPage> {
   final _searchCtrl = TextEditingController();
   List<Tutor> _filtered = MockData.tutors;
   String _activeChip = 'All';
+  String _activePriceChip = 'All';
 
   static const _chips = [
     ('All', '🌈'),
@@ -28,10 +29,24 @@ class _SiswaSearchPageState extends State<SiswaSearchPage> {
     ('History', '🏛️'),
   ];
 
-  void _applyFilter(String query, String chip) {
+  // Price ranges in IDR (ratePerHour values from mock data)
+  static const _priceChips = [
+    ('All', '💰', 0.0, double.infinity),
+    ('< 50k', '🟢', 0.0, 50000.0),
+    ('50k–100k', '🟡', 50000.0, 100000.0),
+    ('> 100k', '🔴', 100000.0, double.infinity),
+  ];
+
+  void _applyFilter(String query, String chip, String priceChip) {
     final q = query.toLowerCase();
+    // Find the price range for the active price chip
+    final priceRange = _priceChips.firstWhere(
+      (p) => p.$1 == priceChip,
+      orElse: () => _priceChips.first,
+    );
     setState(() {
       _activeChip = chip;
+      _activePriceChip = priceChip;
       _filtered = MockData.tutors.where((t) {
         final matchesSearch = q.isEmpty ||
             t.name.toLowerCase().contains(q) ||
@@ -40,7 +55,9 @@ class _SiswaSearchPageState extends State<SiswaSearchPage> {
         final matchesChip = chip == 'All' ||
             t.subjects.any(
                 (s) => s.toLowerCase().contains(chip.toLowerCase()));
-        return matchesSearch && matchesChip;
+        final matchesPrice =
+            t.ratePerHour >= priceRange.$3 && t.ratePerHour < priceRange.$4;
+        return matchesSearch && matchesChip && matchesPrice;
       }).toList();
     });
   }
@@ -106,7 +123,7 @@ class _SiswaSearchPageState extends State<SiswaSearchPage> {
                 ),
                 child: TextField(
                   controller: _searchCtrl,
-                  onChanged: (v) => _applyFilter(v, _activeChip),
+          onChanged: (v) => _applyFilter(v, _activeChip, _activePriceChip),
                   style: GoogleFonts.nunito(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -122,7 +139,7 @@ class _SiswaSearchPageState extends State<SiswaSearchPage> {
                                 color: Colors.grey.shade400, size: 20),
                             onPressed: () {
                               _searchCtrl.clear();
-                              _applyFilter('', _activeChip);
+                              _applyFilter('', _activeChip, _activePriceChip);
                             },
                           )
                         : null,
@@ -136,7 +153,7 @@ class _SiswaSearchPageState extends State<SiswaSearchPage> {
           ),
           const SizedBox(height: 14),
 
-          // ── Filter chips ───────────────────────────────────────
+          // ── Subject filter chips ───────────────────────────────────────────
           SizedBox(
             height: 40,
             child: ListView.builder(
@@ -151,7 +168,7 @@ class _SiswaSearchPageState extends State<SiswaSearchPage> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: GestureDetector(
-                    onTap: () => _applyFilter(_searchCtrl.text, chip.$1),
+                    onTap: () => _applyFilter(_searchCtrl.text, chip.$1, _activePriceChip),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
                       padding: const EdgeInsets.symmetric(
@@ -183,6 +200,68 @@ class _SiswaSearchPageState extends State<SiswaSearchPage> {
                             color: active
                                 ? Colors.white
                                 : AppColors.deepBlue,
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // ── Price filter chips ────────────────────────────────────────────
+          SizedBox(
+            height: 38,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _priceChips.length,
+              itemBuilder: (_, i) {
+                final chip = _priceChips[i];
+                final active = _activePriceChip == chip.$1;
+                const priceAccents = [
+                  AppColors.deepBlue,
+                  AppColors.mintGreen,
+                  AppColors.mustardYellow,
+                  AppColors.brightOrange,
+                ];
+                final accent = priceAccents[i % priceAccents.length];
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () => _applyFilter(_searchCtrl.text, _activeChip, chip.$1),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: active ? accent : accent.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(
+                          color: active ? accent : accent.withOpacity(0.3),
+                          width: 1.5,
+                        ),
+                        boxShadow: active
+                            ? [
+                                BoxShadow(
+                                  color: accent.withOpacity(0.35),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text(chip.$2,
+                            style: const TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        Text(
+                          chip.$1,
+                          style: AppTextStyles.chip.copyWith(
+                            color: active ? Colors.white : AppColors.deepBlue,
+                            fontSize: 11,
                           ),
                         ),
                       ]),

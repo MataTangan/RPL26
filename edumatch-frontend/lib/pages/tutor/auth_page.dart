@@ -95,6 +95,12 @@ class _TutorAuthPageState extends State<TutorAuthPage>
       _showErrorSnackBar('Email dan password wajib diisi.');
       return;
     }
+    // Email format validation: must contain '@' and a valid domain
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    if (!emailRegex.hasMatch(email)) {
+      _showErrorSnackBar('Format email tidak valid');
+      return;
+    }
 
     // For login (step 0): just need email + password.
     // For register (steps 1-2): also need name.

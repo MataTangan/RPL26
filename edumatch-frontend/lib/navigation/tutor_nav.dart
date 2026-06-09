@@ -55,7 +55,7 @@ class _TutorNavState extends State<TutorNav> {
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.09),
+                color: Colors.black.withValues(alpha: 0.09),
                 blurRadius: 28,
                 offset: const Offset(0, -4),
               ),
@@ -75,11 +75,11 @@ class _TutorNavState extends State<TutorNav> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 7, horizontal: 2),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 7, horizontal: 2),
                     decoration: BoxDecoration(
                       color: active
-                          ? accent.withOpacity(0.18)
+                          ? accent.withValues(alpha: 0.18)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -87,15 +87,13 @@ class _TutorNavState extends State<TutorNav> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(item.icon,
-                            style:
-                                TextStyle(fontSize: active ? 21 : 19)),
+                            style: TextStyle(fontSize: active ? 21 : 19)),
                         const SizedBox(height: 2),
                         AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 200),
                           style: GoogleFonts.nunito(
-                            fontWeight: active
-                                ? FontWeight.w800
-                                : FontWeight.w600,
+                            fontWeight:
+                                active ? FontWeight.w800 : FontWeight.w600,
                             fontSize: 9,
                             color: active
                                 ? AppColors.deepBlue

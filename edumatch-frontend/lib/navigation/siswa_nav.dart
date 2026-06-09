@@ -3,156 +3,121 @@ import 'package:google_fonts/google_fonts.dart';
 import '../pages/siswa/search_page.dart';
 import '../pages/siswa/booking_history_page.dart';
 import '../pages/siswa/chat_page.dart';
+import '../screens/profile_screen.dart';
+import '../services/mock_data.dart';
 import '../theme.dart';
 
-// ─── Stub profile page for Siswa ─────────────────────────────────────────────
-class _SiswaProfilePage extends StatelessWidget {
-  const _SiswaProfilePage();
+
+// ─── Chat contacts list ───────────────────────────────────────────────────────
+class _SiswaChatContactsPage extends StatelessWidget {
+  const _SiswaChatContactsPage();
+
+  static const _accentEmojis = ['🌟', '📚', '🎓', '🔬', '🎵', '💻'];
 
   @override
   Widget build(BuildContext context) {
+    final tutors = MockData.tutors;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 16),
-              // Avatar
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.mustardYellow, AppColors.brightOrange],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.mustardYellow.withOpacity(0.45),
-                      blurRadius: 22,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Center(
-                    child: Text('👨‍🎓', style: TextStyle(fontSize: 46))),
-              ),
-              const SizedBox(height: 14),
-              Text('Rizky Maulana',
-                  style: AppTextStyles.displayBold.copyWith(fontSize: 22)),
-              const SizedBox(height: 6),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.deepBlue,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Text('Student  🎓',
-                    style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                        color: Colors.white)),
-              ),
-              const SizedBox(height: 28),
-              // Stat row
-              Row(children: [
-                _Stat(emoji: '📅', value: '2', label: 'Upcoming'),
-                const SizedBox(width: 10),
-                _Stat(emoji: '✅', value: '2', label: 'Completed'),
-                const SizedBox(width: 10),
-                _Stat(emoji: '🎓', value: '6', label: 'Tutors'),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Messages 💬', style: AppTextStyles.displayBold),
+                const SizedBox(height: 4),
+                Text('Chat with your tutors', style: AppTextStyles.appBarSub),
               ]),
-              const SizedBox(height: 28),
-              // Settings
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('⚙️  Settings',
-                    style: AppTextStyles.cardTitle.copyWith(fontSize: 16)),
-              ),
-              const SizedBox(height: 12),
-              ...[
-                ('👤', 'Edit Profile', AppColors.mustardYellow),
-                ('🔔', 'Notifications', AppColors.mintGreen),
-                ('🔒', 'Privacy & Security', AppColors.pastelPurple),
-                ('💳', 'Payment Methods', AppColors.skyBlue),
-                ('❓', 'Help & Support', AppColors.brightOrange),
-                ('🚪', 'Logout', const Color(0xFFFF8888)),
-              ].map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 10)
-                        ],
-                      ),
-                      child: Row(children: [
-                        Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: item.$3.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(12),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: tutors.length,
+                itemBuilder: (ctx, i) {
+                  final tutor = tutors[i];
+                  final accent =
+                      AppColors.cardAccents[i % AppColors.cardAccents.length];
+                  final emoji = _accentEmojis[i % _accentEmojis.length];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: GestureDetector(
+                      onTap: () => Navigator.push(
+                        ctx,
+                        MaterialPageRoute(
+                          builder: (_) => SiswaChatPage(
+                            tutorName: tutor.name,
+                            tutorEmoji: tutor.avatarEmoji.isNotEmpty
+                                ? tutor.avatarEmoji
+                                : emoji,
+                            accent: accent,
                           ),
-                          child: Center(
-                              child: Text(item.$1,
-                                  style: const TextStyle(fontSize: 18))),
                         ),
-                        const SizedBox(width: 14),
-                        Text(item.$2,
-                            style:
-                                AppTextStyles.cardTitle.copyWith(fontSize: 15)),
-                        const Spacer(),
-                        Icon(Icons.chevron_right_rounded,
-                            color: Colors.grey.shade400),
-                      ]),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: accent.withValues(alpha: 0.15),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: accent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                tutor.avatarEmoji.isNotEmpty
+                                    ? tutor.avatarEmoji
+                                    : emoji,
+                                style: const TextStyle(fontSize: 22),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(tutor.name,
+                                    style: AppTextStyles.cardTitle
+                                        .copyWith(fontSize: 15)),
+                                const SizedBox(height: 3),
+                                Text(
+                                  tutor.subjects.join(' · '),
+                                  style:
+                                      AppTextStyles.bodyMuted.copyWith(fontSize: 12),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.chevron_right_rounded,
+                              color: Colors.grey.shade400),
+                        ]),
+                      ),
                     ),
-                  )),
-            ],
-          ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-}
-
-class _Stat extends StatelessWidget {
-  final String emoji, value, label;
-  const _Stat(
-      {required this.emoji, required this.value, required this.label});
-
-  @override
-  Widget build(BuildContext context) => Expanded(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.05), blurRadius: 10)
-            ],
-          ),
-          child: Column(children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
-            const SizedBox(height: 4),
-            Text(value,
-                style: AppTextStyles.cardTitle.copyWith(fontSize: 20)),
-            Text(label, style: AppTextStyles.bodyMuted),
-          ]),
-        ),
-      );
 }
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
@@ -179,14 +144,6 @@ class _SiswaNavState extends State<SiswaNav> {
     _NavItem(icon: '👤', label: 'Profil'),
   ];
 
-  // Chat page requires a specific tutor context.
-  // For the nav-level chat, we open a default chat with the first tutor.
-  Widget _chatPage() => const SiswaChatPage(
-        tutorName: 'Aisha Rahma',
-        tutorEmoji: '🌟',
-        accent: AppColors.mintGreen,
-      );
-
   Widget _screen(int i) {
     switch (i) {
       case 0:
@@ -194,9 +151,9 @@ class _SiswaNavState extends State<SiswaNav> {
       case 1:
         return const SiswaBookingHistoryPage();
       case 2:
-        return _chatPage();
+        return const _SiswaChatContactsPage();
       case 3:
-        return const _SiswaProfilePage();
+        return const ProfileScreen();
       default:
         return const SiswaSearchPage();
     }
@@ -220,7 +177,7 @@ class _SiswaNavState extends State<SiswaNav> {
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.09),
+                color: Colors.black.withValues(alpha: 0.09),
                 blurRadius: 28,
                 offset: const Offset(0, -4),
               ),
@@ -240,11 +197,11 @@ class _SiswaNavState extends State<SiswaNav> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8, horizontal: 4),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                     decoration: BoxDecoration(
                       color: active
-                          ? accent.withOpacity(0.18)
+                          ? accent.withValues(alpha: 0.18)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(18),
                     ),
@@ -252,15 +209,13 @@ class _SiswaNavState extends State<SiswaNav> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(item.icon,
-                            style:
-                                TextStyle(fontSize: active ? 22 : 20)),
+                            style: TextStyle(fontSize: active ? 22 : 20)),
                         const SizedBox(height: 3),
                         AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 200),
                           style: GoogleFonts.nunito(
-                            fontWeight: active
-                                ? FontWeight.w800
-                                : FontWeight.w600,
+                            fontWeight:
+                                active ? FontWeight.w800 : FontWeight.w600,
                             fontSize: 10,
                             color: active
                                 ? AppColors.deepBlue

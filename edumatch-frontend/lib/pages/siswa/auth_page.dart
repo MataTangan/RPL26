@@ -89,6 +89,12 @@ class _SiswaAuthPageState extends State<SiswaAuthPage>
       _showErrorSnackBar('Email dan password wajib diisi.');
       return;
     }
+    // Email format validation: must contain '@' and a valid domain
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    if (!emailRegex.hasMatch(email)) {
+      _showErrorSnackBar('Format email tidak valid');
+      return;
+    }
     if (!_isLogin && name.isEmpty) {
       _showErrorSnackBar('Nama lengkap wajib diisi.');
       return;

@@ -27,13 +27,11 @@ class _BookingsScreenState extends State<BookingsScreen>
     super.dispose();
   }
 
-  List<BookingSession> get _upcoming => MockData.sessions
-      .where((s) => s.status == SessionStatus.active)
-      .toList();
+  List<BookingSession> get _upcoming =>
+      MockData.sessions.where((s) => s.status == SessionStatus.active).toList();
 
-  List<BookingSession> get _past => MockData.sessions
-      .where((s) => s.status == SessionStatus.past)
-      .toList();
+  List<BookingSession> get _past =>
+      MockData.sessions.where((s) => s.status == SessionStatus.past).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +42,12 @@ class _BookingsScreenState extends State<BookingsScreen>
           // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('My Bookings 📅', style: AppTextStyles.displayBold),
               const SizedBox(height: 4),
-              Text('Track your upcoming & past sessions', style: AppTextStyles.appBarSub),
+              Text('Track your upcoming & past sessions',
+                  style: AppTextStyles.appBarSub),
               const SizedBox(height: 16),
               // Custom tab bar
               Container(
@@ -56,12 +56,18 @@ class _BookingsScreenState extends State<BookingsScreen>
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10)
+                  ],
                 ),
                 child: TabBar(
                   controller: _tab,
-                  labelStyle: GoogleFonts.nunito(fontWeight: FontWeight.w800, fontSize: 14),
-                  unselectedLabelStyle: GoogleFonts.nunito(fontWeight: FontWeight.w600, fontSize: 14),
+                  labelStyle: GoogleFonts.nunito(
+                      fontWeight: FontWeight.w800, fontSize: 14),
+                  unselectedLabelStyle: GoogleFonts.nunito(
+                      fontWeight: FontWeight.w600, fontSize: 14),
                   labelColor: Colors.white,
                   unselectedLabelColor: const Color(0xFF888899),
                   indicator: BoxDecoration(
@@ -83,8 +89,10 @@ class _BookingsScreenState extends State<BookingsScreen>
             child: TabBarView(
               controller: _tab,
               children: [
-                _SessionList(sessions: _upcoming, emptyMsg: 'No upcoming sessions!'),
-                _SessionList(sessions: _past, emptyMsg: 'No completed sessions yet.'),
+                _SessionList(
+                    sessions: _upcoming, emptyMsg: 'No upcoming sessions!'),
+                _SessionList(
+                    sessions: _past, emptyMsg: 'No completed sessions yet.'),
               ],
             ),
           ),
@@ -123,38 +131,54 @@ class _SessionList extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(24),
-              boxShadow: [BoxShadow(color: accent.withOpacity(0.18), blurRadius: 18, offset: const Offset(0, 6))],
+              boxShadow: [
+                BoxShadow(
+                    color: accent.withValues(alpha: 0.18),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6))
+              ],
             ),
             child: Row(children: [
               Container(
-                width: 52, height: 52,
-                decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
-                child: Center(child: Text(s.tutorAvatarEmoji, style: const TextStyle(fontSize: 24))),
+                width: 52,
+                height: 52,
+                decoration:
+                    BoxDecoration(color: accent, shape: BoxShape.circle),
+                child: Center(
+                    child: Text(s.tutorAvatarEmoji,
+                        style: const TextStyle(fontSize: 24))),
               ),
               const SizedBox(width: 14),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(s.tutorName, style: AppTextStyles.cardTitle.copyWith(fontSize: 15)),
-                const SizedBox(height: 2),
-                Text(s.subject, style: AppTextStyles.bodyMuted),
-                const SizedBox(height: 4),
-                Row(children: [
-                  const Text('🗓️', style: TextStyle(fontSize: 12)),
-                  const SizedBox(width: 4),
-                  Text('${s.date}  •  ${s.timeSlot}', style: AppTextStyles.bodyMuted),
-                ]),
-              ])),
+              Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Text(s.tutorName,
+                        style: AppTextStyles.cardTitle.copyWith(fontSize: 15)),
+                    const SizedBox(height: 2),
+                    Text(s.subject, style: AppTextStyles.bodyMuted),
+                    const SizedBox(height: 4),
+                    Row(children: [
+                      const Text('🗓️', style: TextStyle(fontSize: 12)),
+                      const SizedBox(width: 4),
+                      Text('${s.date}  •  ${s.timeSlot}',
+                          style: AppTextStyles.bodyMuted),
+                    ]),
+                  ])),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: accent.withOpacity(0.15),
+                    color: accent.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: Text(s.status.label,
-                      style: AppTextStyles.chip.copyWith(color: AppColors.deepBlue)),
+                      style: AppTextStyles.chip
+                          .copyWith(color: AppColors.deepBlue)),
                 ),
                 const SizedBox(height: 6),
-                Text('\$${s.ratePerHour.toStringAsFixed(0)}',
+                Text('Rp ${s.ratePerHour.toStringAsFixed(0)}',
                     style: AppTextStyles.priceBadge.copyWith(fontSize: 16)),
               ]),
             ]),
